@@ -205,3 +205,11 @@ line-height:2;
 .property-details button{
     margin-top:20px;
 }
+.viewing-btn{
+    background:#ff9800;
+    margin-top:15px;
+}
+
+.viewing-btn:hover{
+    background:#e68900;
+}

@@ -166,3 +166,16 @@ width:280px;
 border-radius:10px;
 box-shadow:0 2px 8px rgba(0,0,0,.1);
 }
+.cta{
+background:#0d6efd;
+color:white;
+text-align:center;
+padding:60px 20px;
+}
+
+.cta button{
+background:#25D366;
+width:auto;
+padding:15px 30px;
+font-size:18px;
+}

@@ -6,3 +6,8 @@ button.onclick=()=>{
 window.location.href="property.html";
 };
 });
+document.querySelectorAll(".viewing-btn").forEach(button=>{
+    button.onclick=()=>{
+        alert("Viewing request received! We will contact you shortly.");
+    };
+});

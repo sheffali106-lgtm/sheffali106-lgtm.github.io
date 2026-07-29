@@ -179,3 +179,18 @@ width:auto;
 padding:15px 30px;
 font-size:18px;
 }
+.property-details{
+max-width:900px;
+margin:auto;
+padding:30px;
+}
+
+.property-details img{
+width:100%;
+border-radius:15px;
+margin-bottom:20px;
+}
+
+.property-details ul{
+line-height:2;
+}

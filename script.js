@@ -64,9 +64,11 @@ async function loadProperties() {
 
             container.appendChild(card);
 
-        });
+        });// Ends querySnapshot.forEach()
 
-    } catch (error) {
+    } // Ends try
+
+} catch (error) {
 
         console.error("Error loading properties:", error);
 

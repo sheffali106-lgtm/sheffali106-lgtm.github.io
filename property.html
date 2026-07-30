@@ -46,6 +46,20 @@ Contact on WhatsApp
 </button>
 
 </section>
+<script>
+const property = JSON.parse(localStorage.getItem("selectedProperty"));
 
+if (property) {
+    document.getElementById("title").innerText = property.title;
+    document.getElementById("location").innerText = property.location;
+    document.getElementById("price").innerText = property.price;
+    document.getElementById("description").innerText = property.description;
+}
+
+document.querySelector(".viewing-btn").onclick = () => {
+    alert("Viewing request received! We will contact you shortly.");
+};
+</script>
+    
 </body>
 </html>

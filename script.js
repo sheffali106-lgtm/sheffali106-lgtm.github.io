@@ -15,9 +15,9 @@ async function loadProperties() {
 
     try {
 
-        const querySnapshot = await getDocs(collection(db, "properties"));
+        const snapshot = await getDocs(collection(db, "properties"));
 
-        querySnapshot.forEach((doc) => {
+        snapshot.forEach((doc) => {
 
             const property = doc.data();
 
@@ -26,6 +26,8 @@ async function loadProperties() {
             card.className = "card";
 
             card.innerHTML = `
+                <img src="${property.image || 'https://picsum.photos/400/250'}" alt="${property.title}">
+
                 <div class="card-content">
 
                     <h3>${property.title}</h3>
@@ -45,7 +47,6 @@ async function loadProperties() {
                     <button class="details-btn">
                         View Details
                     </button>
-
                 </div>
             `;
             card.querySelector(".whatsapp-btn").addEventListener("click", () => {
@@ -60,32 +61,34 @@ async function loadProperties() {
                 );
 
                 window.location.href = "property.html";
+
             });
 
             container.appendChild(card);
 
-        });// Ends querySnapshot.forEach()
+        });
 
-    } // Ends try
+    } catch (error) {
 
-     catch (error) {
-
-        console.error("Error loading properties:", error);
+        console.error(error);
 
         container.innerHTML = `
-            <p>Failed to load properties. Please try again later.</p>
+            <h3 style="text-align:center;">
+                Unable to load properties.
+            </h3>
         `;
     }
-}
-loadProperties();
 
+}
+
+loadProperties();
 window.searchProperties = function () {
 
-    const input = document.getElementById("searchInput");
+    const searchInput = document.getElementById("searchInput");
 
-    if (!input) return;
+    if (!searchInput) return;
 
-    const filter = input.value.toLowerCase();
+    const filter = searchInput.value.toLowerCase();
 
     const cards = document.querySelectorAll(".card");
 

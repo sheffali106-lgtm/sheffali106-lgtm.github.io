@@ -75,3 +75,28 @@ async function loadProperties() {
         `;
     }
 }
+loadProperties();
+
+window.searchProperties = function () {
+
+    const input = document.getElementById("searchInput");
+
+    if (!input) return;
+
+    const filter = input.value.toLowerCase();
+
+    const cards = document.querySelectorAll(".card");
+
+    cards.forEach((card) => {
+
+        const text = card.innerText.toLowerCase();
+
+        if (text.includes(filter)) {
+            card.style.display = "";
+        } else {
+            card.style.display = "none";
+        }
+
+    });
+
+};

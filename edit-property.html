@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Property | RentEasy Kenya</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="logo">🏠 RentEasy Kenya</div>
+    <ul class="nav-links">
+        <li><a href="dashboard.html">← Back to Dashboard</a></li>
+    </ul>
+</nav>
+
+<section class="featured">
+
+    <h2>Edit Property</h2>
+
+    <form id="editForm">
+
+        <input type="text" id="title" placeholder="Property Title" required>
+
+        <input type="text" id="location" placeholder="Location" required>
+
+        <input type="number" id="price" placeholder="Monthly Rent" required>
+
+        <input type="number" id="rooms" placeholder="Bedrooms" required>
+
+        <input type="text" id="image" placeholder="Image URL">
+
+        <textarea id="description"
+                  placeholder="Property Description"
+                  rows="5"
+                  required></textarea>
+
+        <button type="submit" class="btn">
+            💾 Save Changes
+        </button>
+
+    </form>
+
+</section>
+
+<script type="module" src="edit-property.js"></script>
+
+</body>
+</html>

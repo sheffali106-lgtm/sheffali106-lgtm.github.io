@@ -66,7 +66,7 @@ async function loadDashboard() {
     window.location.href = "edit-property.html";
 
 });
-            });
+    
 
             card.querySelector(".delete-btn").addEventListener("click", async () => {
 

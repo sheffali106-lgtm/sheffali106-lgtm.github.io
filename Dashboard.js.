@@ -1,0 +1,59 @@
+import { db } from "./firebase.js";
+
+import {
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+async function loadDashboard() {
+
+    const container = document.getElementById("dashboardProperties");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    const snapshot = await getDocs(collection(db, "properties"));
+
+    snapshot.forEach((doc) => {
+
+        const property = doc.data();
+
+        const card = document.createElement("div");
+
+        card.className = "card";
+              card.innerHTML = `
+            <img src="${property.image || 'https://picsum.photos/400/250'}" alt="${property.title}">
+
+            <div class="card-content">
+
+                <h3>${property.title}</h3>
+
+                <p>📍 ${property.location}</p>
+
+                <p class="price">KSh ${property.price}/month</p>
+
+                <p>${property.description}</p>
+
+                <button class="edit-btn">✏️ Edit</button>
+
+                <button class="delete-btn">🗑️ Delete</button>
+
+            </div>
+        `;
+
+        card.querySelector(".edit-btn").addEventListener("click", () => {
+            alert("Edit feature coming next.");
+        });
+
+        card.querySelector(".delete-btn").addEventListener("click", () => {
+            alert("Delete feature coming next.");
+        });
+
+        container.appendChild(card);
+
+    });
+
+}
+
+loadDashboard();

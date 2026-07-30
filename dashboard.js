@@ -60,7 +60,12 @@ async function loadDashboard() {
             `;
 
             card.querySelector(".edit-btn").addEventListener("click", () => {
-                alert("Edit feature coming soon.");
+
+    localStorage.setItem("editPropertyId", property.id);
+
+    window.location.href = "edit-property.html";
+
+});
             });
 
             card.querySelector(".delete-btn").addEventListener("click", async () => {

@@ -68,7 +68,7 @@ async function loadProperties() {
 
     } // Ends try
 
-} catch (error) {
+     catch (error) {
 
         console.error("Error loading properties:", error);
 

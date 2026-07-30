@@ -30,22 +30,3 @@ if (savedProperty) {
 
     properties.prepend(newCard);
 }
-const savedProperty = JSON.parse(localStorage.getItem("latestProperty"));
-
-if (savedProperty) {
-    const properties = document.querySelector(".properties");
-
-    const newCard = document.createElement("div");
-    newCard.className = "card";
-
-    newCard.innerHTML = `
-        <h3>${savedProperty.title}</h3>
-        <p>📍 ${savedProperty.location}</p>
-        <p><strong>KSh ${savedProperty.price}/month</strong></p>
-        <p>🛏️ ${savedProperty.rooms} Bedrooms</p>
-        <p>${savedProperty.description}</p>
-        <button>Contact on WhatsApp</button>
-    `;
-
-    properties.prepend(newCard);
-}

@@ -34,6 +34,7 @@ async function loadDashboard() {
             const property = {
                 id: documentSnapshot.id,
                 ...documentSnapshot.data()
+                console.log(property);
             };
 
             const card = document.createElement("div");

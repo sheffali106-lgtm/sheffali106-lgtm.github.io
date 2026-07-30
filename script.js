@@ -84,11 +84,14 @@ async function loadProperties() {
 loadProperties();
 window.searchProperties = function () {
 
-    const searchInput = document.getElementById("searchInput");
+    const location =
+        document.getElementById("searchLocation").value.toLowerCase();
 
-    if (!searchInput) return;
+    const rooms =
+        document.getElementById("searchRooms").value;
 
-    const filter = searchInput.value.toLowerCase();
+    const maxPrice =
+        document.getElementById("searchPrice").value;
 
     const cards = document.querySelectorAll(".card");
 
@@ -96,7 +99,28 @@ window.searchProperties = function () {
 
         const text = card.innerText.toLowerCase();
 
-        if (text.includes(filter)) {
+        const matchesLocation =
+            location === "" || text.includes(location);
+
+        const matchesRooms =
+            rooms === "" || text.includes(rooms + " bedroom");
+
+        let matchesPrice = true;
+
+        if (maxPrice !== "") {
+
+            const priceText =
+                card.querySelector(".price").innerText;
+
+            const priceElement = card.querySelector(".price");
+
+if (!priceElement) return;
+
+const price =
+    parseInt(priceElement.innerText.replace(/[^0-9]/g, ""));
+        }
+
+        if (matchesLocation && matchesRooms && matchesPrice) {
             card.style.display = "";
         } else {
             card.style.display = "none";

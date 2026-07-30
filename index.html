@@ -1,1 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RentEasy Kenya</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="logo">
+        🏠 RentEasy Kenya
+    </div>
+
+    <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#properties">Properties</a></li>
+        <li><a href="list-property.html">List Property</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+
+</nav>
+
+<header class="hero">
+
+    <h1>Find Your Dream Home in Kenya</h1>
+
+    <p>
+        Browse verified apartments, bedsitters, studios,
+        maisonettes and houses across Kenya.
+    </p>
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Search by location..."
+        >
+
+        <button onclick="searchProperties()">
+            Search
+        </button>
+
+    </div>
+
+</header>
+
+<section class="featured">
+
+    <h2>Featured Properties</h2>
+
+    <div id="dynamicProperties" class="properties">
+
+        <!-- Firebase properties will appear here -->
+
+    </div>
+
+</section class="why-us">
+
+    <h2>Why Choose RentEasy Kenya?</h2>
+
+    <div class="features">
+
+        <div class="feature">
+            <h3>✅ Verified Listings</h3>
+            <p>Every property is carefully listed to help you find a trusted home.</p>
+        </div>
+
+        <div class="feature">
+            <h3>💬 Direct WhatsApp Contact</h3>
+            <p>Chat directly with landlords and agents without any middlemen.</p>
+        </div>
+
+        <div class="feature">
+            <h3>📍 Prime Locations</h3>
+            <p>Find homes in Kileleshwa, Kilimani, Westlands, Runda, Ruaka and many more locations.</p>
+        </div>
+
+    </div>
+
+</section>
+
+<section class="cta">
+
+    <h2>Are You a Landlord?</h2>
+
+    <p>
+        List your rental property and connect with thousands of potential tenants across Kenya.
+    </p>
+
+    <a href="list-property.html" class="btn">
+        List Your Property
+    </a>
+
+</section>
+
+<footer>
+
+    <p>&copy; 2026 RentEasy Kenya. All Rights Reserved.</p>
+
+</footer>
+
+<script type="module" src="script.js"></script>
+
+</body>
+</html>

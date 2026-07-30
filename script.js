@@ -1,84 +1,50 @@
+import { db } from "./firebase.js";
 
-document.querySelectorAll(".details-btn").forEach(button => {
-    button.addEventListener("click", () => {
+import {
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-        const card = button.closest(".card");
+async function loadProperties() {
 
-        const property = {
-            title: card.querySelector("h3").innerText,
-            location: card.querySelectorAll("p")[0].innerText,
-            price: card.querySelector(".price")
-                ? card.querySelector(".price").innerText
-                : card.querySelector("strong").innerText,
-            description: "Beautiful rental property in a prime location."
-        };
+    const container = document.getElementById("dynamicProperties");
 
-        localStorage.setItem("selectedProperty", JSON.stringify(property));
+    if (!container) return;
 
-        window.location.href = "property.html";
-    });
-});
+    container.innerHTML = "";
 
-document.querySelectorAll(".viewing-btn").forEach(button => {
-    button.addEventListener("click", () => {
-        alert("Viewing request received! We will contact you shortly.");
-    });
-});
+    try {
 
-const savedProperty = JSON.parse(localStorage.getItem("latestProperty"));
+        const querySnapshot = await getDocs(collection(db, "properties"));
 
-if (savedProperty) {
+        querySnapshot.forEach((doc) => {
 
-    const properties = document.querySelector(".properties");
+            const property = doc.data();
 
-    if (properties) {
+            const card = document.createElement("div");
 
-        const newCard = document.createElement("div");
+            card.className = "card";
 
-        newCard.className = "card";
+            card.innerHTML = `
+                <div class="card-content">
 
-        newCard.innerHTML = `
-            <div class="card-content">
-                <h3>${savedProperty.title}</h3>
-                <p>📍 ${savedProperty.location}</p>
-                <p>🛏️ ${savedProperty.rooms} Bedrooms</p>
-                <p class="price">KSh ${savedProperty.price}/month</p>
-                <p>${savedProperty.description}</p>
+                    <h3>${property.title}</h3>
 
-                <button onclick="window.open('https://wa.me/254799520544','_blank')">
-                    Contact on WhatsApp
-                </button>
+                    <p>📍 ${property.location}</p>
 
-                <button class="details-btn">
-                    View Details
-                </button>
-            </div>
-        `;
+                    <p>🛏️ ${property.rooms} Bedrooms</p>
 
-        properties.prepend(newCard);
-    }
-}
+                    <p class="price">KSh ${property.price}/month</p>
 
-function searchProperties() {
+                    <p>${property.description}</p>
 
-    const input = document.getElementById("searchInput");
+                    <button class="whatsapp-btn">
+                        Contact on WhatsApp
+                    </button>
 
-    if (!input) return;
+                    <button class="details-btn">
+                        View Details
+                    </button>
 
-    const filter = input.value.toLowerCase();
-
-    const cards = document.querySelectorAll(".card");
-
-    cards.forEach(card => {
-
-        const text = card.innerText.toLowerCase();
-
-        if (text.includes(filter)) {
-            card.style.display = "";
-        } else {
-            card.style.display = "none";
-        }
-
-    });
-
-}
+                </div>
+            `;

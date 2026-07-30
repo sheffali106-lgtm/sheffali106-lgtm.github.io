@@ -63,7 +63,32 @@
         <button id="viewingBtn" class="details-btn">
             Book Viewing
         </button>
+<h3>Nearby Places</h3>
 
+<div id="nearbyPlaces" class="features">
+
+    <div class="feature">
+        <h4>🏫 Schools</h4>
+        <p id="nearbySchools">Loading...</p>
+    </div>
+
+    <div class="feature">
+        <h4>🏥 Hospitals</h4>
+        <p id="nearbyHospitals">Loading...</p>
+    </div>
+
+    <div class="feature">
+        <h4>🛒 Supermarkets</h4>
+        <p id="nearbySupermarkets">Loading...</p>
+    </div>
+
+    <div class="feature">
+        <h4>🛍️ Shopping Malls</h4>
+        <p id="nearbyMalls">Loading...</p>
+    </div>
+
+</div>
+        
     </div>
 
 </section>
@@ -90,7 +115,15 @@ document.getElementById("directionsBtn").addEventListener("click", () => {
         "_blank"
     );
 });
+document.getElementById("directionsBtn").addEventListener("click", () => {
 
+    window.open(
+        "https://www.google.com/maps/search/?api=1&query=" +
+        encodeURIComponent(property.location),
+        "_blank"
+    );
+
+});
     document.getElementById("propertyLocation").innerText =
         property.location;
 

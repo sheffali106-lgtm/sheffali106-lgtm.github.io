@@ -1,65 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Property Details - RentEasy Kenya</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Details | RentEasy Kenya</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<nav>
-<h2>🏠 RentEasy Kenya</h2>
+<nav class="navbar">
+
+    <div class="logo">
+        🏠 RentEasy Kenya
+    </div>
+
+    <ul class="nav-links">
+        <li><a href="index.html">← Back to Home</a></li>
+    </ul>
+
 </nav>
 
 <section class="property-details">
 
-<img src="https://picsum.photos/800/500?random=10" alt="Property">
+    <img
+        id="propertyImage"
+        src="https://picsum.photos/800/500"
+        alt="Property Image"
+    >
 
-<div id="propertyDetails">
-    <h1 id="title"></h1>
+    <div class="card-content">
 
-    <p id="location"></p>
+        <h1 id="propertyTitle">Loading...</h1>
 
-    <h2 id="price"></h2>
+        <p id="propertyLocation"></p>
 
-    <p id="description"></p>
-</div>
+        <h2 id="propertyPrice"></h2>
 
-<h3>Amenities</h3>
+        <p id="propertyDescription"></p>
 
-<ul>
-<li>✅ Parking</li>
-<li>✅ CCTV Security</li>
-<li>✅ Backup Generator</li>
-<li>✅ Borehole Water</li>
-<li>✅ Fibre Internet</li>
-</ul>
-<h3>Book a Viewing</h3>
+        <button id="whatsappBtn" class="whatsapp-btn">
+            Contact on WhatsApp
+        </button>
 
-<p>Interested in this property? Book a viewing today.</p>
+        <button id="viewingBtn" class="details-btn">
+            Book Viewing
+        </button>
 
-<button class="viewing-btn">Book a Viewing</button>
-<button onclick="window.open('https://wa.me/254799520544')">
-Contact on WhatsApp
-</button>
+    </div>
 
 </section>
-<script>
+    
+    <script>
 const property = JSON.parse(localStorage.getItem("selectedProperty"));
 
 if (property) {
-    document.getElementById("title").innerText = property.title;
-    document.getElementById("location").innerText = property.location;
-    document.getElementById("price").innerText = property.price;
-    document.getElementById("description").innerText = property.description;
+
+    document.getElementById("propertyTitle").innerText =
+        property.title;
+
+    document.getElementById("propertyLocation").innerText =
+        property.location;
+
+    document.getElementById("propertyPrice").innerText =
+        property.price;
+
+    document.getElementById("propertyDescription").innerText =
+        property.description;
+
+    if (property.image) {
+        document.getElementById("propertyImage").src =
+            property.image;
+    }
+
 }
 
-document.querySelector(".viewing-btn").onclick = () => {
+document.getElementById("whatsappBtn").addEventListener("click", () => {
+    window.open("https://wa.me/254799520544", "_blank");
+});
+
+document.getElementById("viewingBtn").addEventListener("click", () => {
     alert("Viewing request received! We will contact you shortly.");
-};
+});
 </script>
-    
+
 </body>
 </html>

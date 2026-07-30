@@ -20,8 +20,10 @@ async function loadProperties() {
         snapshot.forEach((doc) => {
 
             const property = doc.data();
-
-            const card = document.createElement("div");
+            
+            console.log("Property:", property);
+            
+            const card = document.createElement("div")
 
             card.className = "card";
 

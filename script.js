@@ -48,3 +48,30 @@ async function loadProperties() {
 
                 </div>
             `;
+            card.querySelector(".whatsapp-btn").addEventListener("click", () => {
+                window.open("https://wa.me/254799520544", "_blank");
+            });
+
+            card.querySelector(".details-btn").addEventListener("click", () => {
+
+                localStorage.setItem(
+                    "selectedProperty",
+                    JSON.stringify(property)
+                );
+
+                window.location.href = "property.html";
+            });
+
+            container.appendChild(card);
+
+        });
+
+    } catch (error) {
+
+        console.error("Error loading properties:", error);
+
+        container.innerHTML = `
+            <p>Failed to load properties. Please try again later.</p>
+        `;
+    }
+}

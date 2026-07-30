@@ -23,8 +23,10 @@ if (savedProperty) {
         <p><strong>KSh ${savedProperty.price}/month</strong></p>
         <p>🛏️ ${savedProperty.rooms} Bedrooms</p>
         <p>${savedProperty.description}</p>
-        <button>Contact on WhatsApp</button>
-    `;
+        
+    `;<button onclick="window.open('https://wa.me/254700000000','_blank')">
+    Contact on WhatsApp
+</button>
 
     properties.prepend(newCard);
 }

@@ -1,8 +1,23 @@
 
-document.querySelectorAll(".details-btn").forEach(button=>{
-button.onclick=()=>{
-window.location.href="property.html";
-};
+document.querySelectorAll(".details-btn").forEach(button => {
+    button.onclick = () => {
+        const card = button.closest(".card");
+
+        const property = {
+            title: card.querySelector("h3").innerText,
+            location: card.querySelector("p").innerText,
+            price: card.querySelector(".price")
+                ? card.querySelector(".price").innerText
+                : card.querySelector("strong").innerText,
+            description: card.querySelectorAll("p")[3]
+                ? card.querySelectorAll("p")[3].innerText
+                : ""
+        };
+
+        localStorage.setItem("selectedProperty", JSON.stringify(property));
+
+        window.location.href = "property.html";
+    };
 });
 document.querySelectorAll(".viewing-btn").forEach(button=>{
     button.onclick=()=>{

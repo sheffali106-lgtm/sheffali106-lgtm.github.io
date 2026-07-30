@@ -18,4 +18,4 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/12.16.0/firebas
   const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-export { db };
+export { app, db };

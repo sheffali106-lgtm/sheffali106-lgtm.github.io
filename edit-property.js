@@ -2,7 +2,8 @@ import { db } from "./firebase.js";
 
 import {
     doc,
-    getDoc
+    getDoc,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const propertyId = localStorage.getItem("editPropertyId");
@@ -26,5 +27,37 @@ if (propertySnap.exists()) {
     document.getElementById("rooms").value = property.rooms || "";
     document.getElementById("image").value = property.image || "";
     document.getElementById("description").value = property.description || "";
-
 }
+
+document.getElementById("editForm").addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    try {
+
+        await updateDoc(propertyRef, {
+
+            title: document.getElementById("title").value,
+            location: document.getElementById("location").value,
+            price: document.getElementById("price").value,
+            rooms: document.getElementById("rooms").value,
+            image: document.getElementById("image").value,
+            description: document.getElementById("description").value
+
+        });
+
+        alert("Property updated successfully!");
+
+        localStorage.removeItem("editPropertyId");
+
+        window.location.href = "dashboard.html";
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Failed to update property.");
+
+    }
+
+});

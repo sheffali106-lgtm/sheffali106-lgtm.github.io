@@ -40,7 +40,22 @@
         <h2 id="propertyPrice"></h2>
 
         <p id="propertyDescription"></p>
+<h3>Location</h3>
 
+<iframe
+    id="propertyMap"
+    width="100%"
+    height="350"
+    style="border:0;border-radius:10px;"
+    loading="lazy"
+    allowfullscreen>
+</iframe>
+
+<br><br>
+
+<button id="directionsBtn" class="details-btn">
+    📍 Get Directions
+</button>
         <button id="whatsappBtn" class="whatsapp-btn">
             Contact on WhatsApp
         </button>
@@ -60,6 +75,21 @@ if (property) {
 
     document.getElementById("propertyTitle").innerText =
         property.title;
+    const map = document.getElementById("propertyMap");
+
+map.src =
+    "https://www.google.com/maps?q=" +
+    encodeURIComponent(property.location) +
+    "&output=embed";
+
+document.getElementById("directionsBtn").addEventListener("click", () => {
+
+    window.open(
+        "https://www.google.com/maps/search/?api=1&query=" +
+        encodeURIComponent(property.location),
+        "_blank"
+    );
+});
 
     document.getElementById("propertyLocation").innerText =
         property.location;

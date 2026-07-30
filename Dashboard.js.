@@ -2,7 +2,9 @@ import { db } from "./firebase.js";
 
 import {
     collection,
-    getDocs
+    getDocs,
+    deleteDoc,
+    doc
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 async function loadDashboard() {
@@ -17,7 +19,10 @@ async function loadDashboard() {
 
     snapshot.forEach((doc) => {
 
-        const property = doc.data();
+        const property = {
+    id: doc.id,
+    ...doc.data()
+};
 
         const card = document.createElement("div");
 
@@ -42,9 +47,31 @@ async function loadDashboard() {
             </div>
         `;
 
-        card.querySelector(".edit-btn").addEventListener("click", () => {
-            alert("Edit feature coming next.");
-        });
+        card.querySelector(".delete-btn").addEventListener("click", async () => {
+
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this property?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+
+        await deleteDoc(doc(db, "properties", property.id));
+
+        alert("Property deleted successfully.");
+
+        loadDashboard();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Failed to delete the property.");
+
+    }
+
+});
 
         card.querySelector(".delete-btn").addEventListener("click", () => {
             alert("Delete feature coming next.");

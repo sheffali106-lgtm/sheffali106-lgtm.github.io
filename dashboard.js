@@ -67,8 +67,7 @@ async function loadDashboard() {
 
 });
     
-
-            card.querySelector(".delete-btn").addEventListener("click", async () => {
+card.querySelector(".delete-btn").addEventListener("click", async () => {
 
                 const confirmed = confirm(
                     "Are you sure you want to delete this property?"

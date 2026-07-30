@@ -59,19 +59,19 @@ async function loadDashboard() {
                 </div>
             `;
 
+            // EDIT PROPERTY
             card.querySelector(".edit-btn").addEventListener("click", () => {
 
-    localStorage.setItem("editPropertyId", property.id);
+                localStorage.setItem("editPropertyId", property.id);
 
-    window.location.href = "edit-property.html";
+                window.location.href = "edit-property.html";
 
-});
-    
-card.querySelector(".delete-btn").addEventListener("click", async () => {
+            });
 
-                const confirmed = confirm(
-                    "Are you sure you want to delete this property?"
-                );
+            // DELETE PROPERTY
+            card.querySelector(".delete-btn").addEventListener("click", async () => {
+
+                const confirmed = confirm("Are you sure you want to delete this property?");
 
                 if (!confirmed) return;
 
@@ -86,7 +86,9 @@ card.querySelector(".delete-btn").addEventListener("click", async () => {
                 } catch (error) {
 
                     console.error(error);
+
                     alert("Failed to delete property.");
+
                 }
 
             });

@@ -11,24 +11,24 @@ const container = document.getElementById("dashboardProperties");
 
 async function loadDashboard() {
 
+    if (!container) return;
+
     container.innerHTML = "<h3>Loading properties...</h3>";
 
     try {
 
-        const snapshot = await getDocs(
-            collection(db, "properties")
-        );
+        const snapshot = await getDocs(collection(db, "properties"));
 
         if (snapshot.empty) {
-
             container.innerHTML = `
                 <h3>No properties found.</h3>
+                <p>Add your first property using the button above.</p>
             `;
-
             return;
         }
 
         container.innerHTML = "";
+
         snapshot.forEach((documentSnapshot) => {
 
             const property = {
@@ -37,7 +37,6 @@ async function loadDashboard() {
             };
 
             const card = document.createElement("div");
-
             card.className = "card";
 
             card.innerHTML = `
@@ -60,9 +59,7 @@ async function loadDashboard() {
                 </div>
             `;
 
-            container.appendChild(card);
-
-        });            card.querySelector(".edit-btn").addEventListener("click", () => {
+            card.querySelector(".edit-btn").addEventListener("click", () => {
                 alert("Edit feature coming soon.");
             });
 
@@ -85,12 +82,12 @@ async function loadDashboard() {
                 } catch (error) {
 
                     console.error(error);
-
                     alert("Failed to delete property.");
-
                 }
 
             });
+
+            container.appendChild(card);
 
         });
 
@@ -108,4 +105,3 @@ async function loadDashboard() {
 }
 
 loadDashboard();
-

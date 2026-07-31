@@ -1,51 +1,128 @@
 import { db } from "./firebase.js";
+
 import {
   collection,
   getDocs
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
+
+const WHATSAPP_NUMBER = "254799520544";
+
+
+// ===============================
+// LOAD PROPERTIES
+// ===============================
+
 async function loadProperties() {
 
   const container = document.getElementById("dynamicProperties");
 
-  if (!container) return;
+  if (!container) {
+    return;
+  }
 
-  container.innerHTML = "<p>Loading properties...</p>";
+  container.innerHTML = `
+    <p style="text-align:center;">
+      Loading properties...
+    </p>
+  `;
 
   try {
 
-    const snapshot = await getDocs(collection(db, "properties"));
+    const snapshot = await getDocs(
+      collection(db, "properties")
+    );
 
     container.innerHTML = "";
 
     if (snapshot.empty) {
-      container.innerHTML = "<h3>No properties available.</h3>";
+
+      container.innerHTML = `
+        <div style="text-align:center;">
+          <h3>No properties available.</h3>
+          <p>Check again later.</p>
+        </div>
+      `;
+
       return;
     }
 
-    snapshot.forEach((doc) => {
 
-      const property = doc.data();
+    snapshot.forEach((documentSnapshot) => {
 
-      console.log("Loaded Property:", property);
+      const property = documentSnapshot.data();
+
+      console.log(
+        "Property loaded:",
+        documentSnapshot.id,
+        property
+      );
+
+
+      // Make sure every property has usable values
+      const title =
+        property.title ||
+        "Rental Property";
+
+      const location =
+        property.location ||
+        "Location unavailable";
+
+      const rooms =
+        property.rooms ||
+        "N/A";
+
+      const price =
+        property.price ||
+        "Price not available";
+
+      const description =
+        property.description ||
+        "No description available.";
+
+      const image =
+        property.image ||
+        "https://picsum.photos/800/500";
+
+
+      // ===============================
+      // PROPERTY CARD
+      // ===============================
 
       const card = document.createElement("div");
+
       card.className = "card";
 
+
       card.innerHTML = `
-        <img src="${property.image || "https://picsum.photos/400/250"}" alt="${property.title || "Property"}">
+
+        <img
+          src="${image}"
+          alt="${title}"
+          onerror="this.src='https://picsum.photos/800/500'"
+        >
 
         <div class="card-content">
 
-          <h3>${property.title || "No Title"}</h3>
+          <h3>
+            ${title}
+          </h3>
 
-          <p>📍 ${property.location || "Location unavailable"}</p>
+          <p>
+            📍 ${location}
+          </p>
 
-          <p>🛏️ ${property.rooms || "N/A"} Bedrooms</p>
+          <p>
+            🛏️ ${rooms} Bedrooms
+          </p>
 
-          <p class="price">KSh ${property.price || "0"}/month</p>
+          <p class="price">
+            KSh ${price}/month
+          </p>
 
-          <p>${property.description || "No description available."}</p>
+          <p>
+            ${description}
+          </p>
 
           <button class="whatsapp-btn">
             Contact on WhatsApp
@@ -56,88 +133,243 @@ async function loadProperties() {
           </button>
 
         </div>
+
       `;
 
-      card.querySelector(".whatsapp-btn").addEventListener("click", () => {
-        window.open("https://wa.me/254799520544", "_blank");
-      });
 
-      card.querySelector(".details-btn").addEventListener("click", () => {
+      // ===============================
+      // WHATSAPP BUTTON
+      // ===============================
 
-        localStorage.setItem(
-          "selectedProperty",
-          JSON.stringify(property)
-        );
+      const whatsappButton =
+        card.querySelector(".whatsapp-btn");
 
-        window.location.href = "property.html";
 
-      });
+      whatsappButton.addEventListener(
+        "click",
+        () => {
+
+          const message =
+            `Hello, I am interested in ${title} in ${location}.`;
+
+          const whatsappURL =
+            `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+
+          window.open(
+            whatsappURL,
+            "_blank"
+          );
+
+        }
+      );
+
+
+      // ===============================
+      // VIEW DETAILS BUTTON
+      // ===============================
+
+      const detailsButton =
+        card.querySelector(".details-btn");
+
+
+      detailsButton.addEventListener(
+        "click",
+        () => {
+
+          // Save the COMPLETE Firestore property
+          localStorage.setItem(
+            "selectedProperty",
+            JSON.stringify({
+              id: documentSnapshot.id,
+              title: title,
+              location: location,
+              rooms: rooms,
+              price: price,
+              description: description,
+              image: image
+            })
+          );
+
+
+          // Open property page
+          window.location.href =
+            "property.html";
+
+        }
+      );
+
 
       container.appendChild(card);
 
     });
 
+
   } catch (error) {
 
-    console.error("Firestore Error:", error);
+    console.error(
+      "Firestore Error:",
+      error
+    );
+
 
     container.innerHTML = `
-      <h3 style="color:red;text-align:center;">
-        Failed to load properties.
-      </h3>
+
+      <div style="
+        text-align:center;
+        padding:30px;
+      ">
+
+        <h3 style="color:red;">
+          Failed to load properties.
+        </h3>
+
+        <p>
+          Please try again later.
+        </p>
+
+      </div>
+
     `;
 
   }
 
 }
 
+
+// Start loading properties
 loadProperties();
+
+
+
+// ===============================
+// SEARCH PROPERTIES
+// ===============================
 
 window.searchProperties = function () {
 
+  const locationInput =
+    document.getElementById(
+      "searchLocation"
+    );
+
+
+  const roomsInput =
+    document.getElementById(
+      "searchRooms"
+    );
+
+
+  const priceInput =
+    document.getElementById(
+      "searchPrice"
+    );
+
+
   const location =
-    document.getElementById("searchLocation")?.value.toLowerCase() || "";
+    locationInput?.value
+      .trim()
+      .toLowerCase() || "";
+
 
   const rooms =
-    document.getElementById("searchRooms")?.value || "";
+    roomsInput?.value || "";
+
 
   const maxPrice =
-    document.getElementById("searchPrice")?.value || "";
+    priceInput?.value || "";
 
-  const cards = document.querySelectorAll(".card");
+
+  const cards =
+    document.querySelectorAll(
+      ".card"
+    );
+
 
   cards.forEach((card) => {
 
-    const text = card.innerText.toLowerCase();
+    const text =
+      card.innerText.toLowerCase();
 
+
+    // Location
     const matchesLocation =
-      location === "" || text.includes(location);
+      location === "" ||
+      text.includes(location);
 
-    const matchesRooms =
-      rooms === "" || text.includes(rooms + " bedroom");
 
+    // Bedrooms
+    let matchesRooms = true;
+
+
+    if (rooms !== "") {
+
+      matchesRooms =
+        text.includes(
+          rooms + " bedrooms"
+        ) ||
+        text.includes(
+          rooms + " bedroom"
+        );
+
+    }
+
+
+    // Price
     let matchesPrice = true;
+
 
     if (maxPrice !== "") {
 
-      const priceElement = card.querySelector(".price");
+      const priceElement =
+        card.querySelector(
+          ".price"
+        );
+
 
       if (priceElement) {
 
-        const price = parseInt(
-          priceElement.innerText.replace(/[^0-9]/g, "")
-        );
+        const priceText =
+          priceElement.innerText
+            .replace(/[^0-9]/g, "");
 
-        matchesPrice = price <= parseInt(maxPrice);
+
+        const price =
+          parseInt(
+            priceText,
+            10
+          );
+
+
+        if (!isNaN(price)) {
+
+          matchesPrice =
+            price <=
+            parseInt(
+              maxPrice,
+              10
+            );
+
+        }
 
       }
 
     }
 
-    card.style.display =
-      (matchesLocation && matchesRooms && matchesPrice)
-        ? ""
-        : "none";
+
+    // Show / hide
+    if (
+      matchesLocation &&
+      matchesRooms &&
+      matchesPrice
+    ) {
+
+      card.style.display = "";
+
+    } else {
+
+      card.style.display = "none";
+
+    }
 
   });
 

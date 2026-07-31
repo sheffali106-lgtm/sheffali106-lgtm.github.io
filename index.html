@@ -1,145 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
+import { db } from "./firebase.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RentEasy Kenya</title>
+const container = document.getElementById('dynamicProperties');
+const searchLocation = document.getElementById('searchLocation');
+const searchType = document.getElementById('searchType');
+const searchBedrooms = document.getElementById('searchBedrooms');
+const searchPrice = document.getElementById('searchPrice');
+const searchBtn = document.getElementById('searchBtn');
 
-    <link rel="stylesheet" href="style.css">
-</head>
+let allProperties = [];
 
-<body>
+function render(properties) {
+    if (!container) return;
+    if (properties.length === 0) {
+        container.innerHTML = `<p style="text-align:center; padding:30px;">No properties found. Try different filters.</p>`;
+        return;
+    }
+    container.innerHTML = properties.map(p => {
+        const location = p.location || p.area || "Location unavailable";
+        const rooms = p.rooms || p.bedrooms || "N/A";
+        const price = p.price || p.rent || 0;
+        const formattedPrice = typeof price === 'number' ? price.toLocaleString() : price;
+        const image = p.image || p.imageUrl || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800";
+        const title = p.title || "Rental Property";
+        const id = p.id;
+        return `
+        <div class="property-card">
+            <img src="${image}" alt="${title}">
+            <div class="property-info">
+                <h3>${title}</h3>
+                <p>📍 ${location}</p>
+                <p>🛏️ ${rooms} Bedrooms</p>
+                <p><strong>KSh ${formattedPrice}/month</strong></p>
+                <a href="property.html?id=${id}" class="btn">View Details</a>
+            </div>
+        </div>`;
+    }).join('');
+}
 
-<nav class="navbar">
+async function load() {
+    if (container) container.innerHTML = "<p style='text-align:center;'>Loading...</p>";
+    const snap = await getDocs(collection(db, "properties"));
+    allProperties = [];
+    snap.forEach(d => allProperties.push({ id: d.id, ...d.data() }));
+    allProperties.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    render(allProperties);
+}
 
-    <div class="logo">
-        🏠 RentEasy Kenya
-    </div>
+function doSearch() {
+    let filtered = [...allProperties];
+    const loc = searchLocation.value.toLowerCase().trim();
+    const type = searchType.value.toLowerCase().trim();
+    const beds = searchBedrooms.value;
+    const maxPrice = parseInt(searchPrice.value);
 
-    <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="#properties">Properties</a></li>
-        <li><a href="list-property.html">List Property</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="contact.html">Contact</a></li>
-    </ul>
+    if (loc) {
+        filtered = filtered.filter(p => {
+            const fullText = `${p.title || ''} ${p.location || ''} ${p.area || ''} ${p.description || ''}`.toLowerCase();
+            return fullText.includes(loc);
+        });
+    }
+    if (type) {
+        filtered = filtered.filter(p => {
+            const fullText = `${p.title || ''} ${p.description || ''} ${p.type || ''}`.toLowerCase();
+            return fullText.includes(type);
+        });
+    }
+    if (beds) {
+        filtered = filtered.filter(p => {
+            const r = parseInt(p.rooms || p.bedrooms || 0);
+            if (beds === "5") return r >= 5;
+            return r == parseInt(beds);
+        });
+    }
+    if (!isNaN(maxPrice) && maxPrice > 0) {
+        filtered = filtered.filter(p => {
+            const price = parseInt(p.price || p.rent || 0);
+            return price <= maxPrice;
+        });
+    }
+    render(filtered);
+}
 
-</nav>
+searchBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    doSearch();
+});
 
-<header class="hero">
+searchLocation.addEventListener('input', doSearch);
+searchType.addEventListener('change', doSearch);
+searchBedrooms.addEventListener('change', doSearch);
+searchPrice.addEventListener('input', doSearch);
 
-    <h1>Find Your Dream Home in Kenya</h1>
-
-    <p>
-        Browse verified apartments, bedsitters, studios,
-        maisonettes and houses across Kenya.
-    </p>
-
-</header>
-
-<!-- NEW SEARCH SECTION -->
-<section class="search-section">
-
-    <h2>Search Properties</h2>
-
-    <div class="search-box">
-
-        <input
-            type="text"
-            id="searchLocation"
-            placeholder="📍 Search location">
-
-        <select id="searchType">
-            <option value="">All Property Types</option>
-            <option>Apartment</option>
-            <option>Maisonette</option>
-            <option>Bedsitter</option>
-            <option>Studio</option>
-            <option>Office</option>
-            <option>Shop</option>
-        </select>
-
-        <select id="searchBedrooms">
-            <option value="">Any Bedrooms</option>
-            <option value="1">1 Bedroom</option>
-            <option value="2">2 Bedrooms</option>
-            <option value="3">3 Bedrooms</option>
-            <option value="4">4 Bedrooms</option>
-            <option value="5">5+ Bedrooms</option>
-        </select>
-
-        <input
-            type="number"
-            id="searchPrice"
-            placeholder="💰 Maximum Rent">
-
-        <button id="searchBtn" class="btn">
-            🔍 Search
-        </button>
-
-    </div>
-
-</section>
-
-<section class="featured" id="properties">
-
-    <h2>Featured Properties</h2>
-
-    <div id="dynamicProperties" class="properties">
-
-        <!-- Firebase properties will appear here -->
-
-    </div>
-
-</section>
-
-<section class="why-us">
-
-    <h2>Why Choose RentEasy Kenya?</h2>
-
-    <div class="features">
-
-        <div class="feature">
-            <h3>✅ Verified Listings</h3>
-            <p>Every property is carefully listed to help you find a trusted home.</p>
-        </div>
-
-        <div class="feature">
-            <h3>💬 Direct WhatsApp Contact</h3>
-            <p>Chat directly with landlords and agents without any middlemen.</p>
-        </div>
-
-        <div class="feature">
-            <h3>📍 Prime Locations</h3>
-            <p>Find homes in Kileleshwa, Kilimani, Westlands, Runda, Ruaka and many more locations.</p>
-        </div>
-
-    </div>
-
-</section>
-
-<section class="cta">
-
-    <h2>Are You a Landlord?</h2>
-
-    <p>
-        List your rental property and connect with thousands of potential tenants across Kenya.
-    </p>
-
-    <a href="list-property.html" class="btn">
-        List Your Property
-    </a>
-
-</section>
-
-<footer>
-
-    <p>&copy; 2026 RentEasy Kenya. All Rights Reserved.</p>
-
-</footer>
-
-<script type="module" src="script.js"></script>
-
-</body>
-</html>
+load();

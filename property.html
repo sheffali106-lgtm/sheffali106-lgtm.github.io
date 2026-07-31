@@ -12,30 +12,21 @@
 <body>
 
 <nav class="navbar">
-
-    <div class="logo">
-        🏠 RentEasy Kenya
-    </div>
+    <div class="logo">🏠 RentEasy Kenya</div>
 
     <ul class="nav-links">
         <li><a href="index.html">← Back to Home</a></li>
     </ul>
-
 </nav>
 
 <section class="property-details">
 
     <div class="gallery">
 
-    <img
-        id="propertyImage"
-        src="https://picsum.photos/800/500"
-        alt="Property Image"
-    >
-
-    <div id="thumbnailGallery" class="thumbnails">
-        <!-- More images will appear here -->
-    </div>
+        <img
+            id="propertyImage"
+            src="https://picsum.photos/800/500"
+            alt="Property Image">
 
     </div>
 
@@ -48,22 +39,24 @@
         <h2 id="propertyPrice"></h2>
 
         <p id="propertyDescription"></p>
-<h3>Location</h3>
 
-<iframe
-    id="propertyMap"
-    width="100%"
-    height="350"
-    style="border:0;border-radius:10px;"
-    loading="lazy"
-    allowfullscreen>
-</iframe>
+        <h3>Location</h3>
 
-<br><br>
+        <iframe
+            id="propertyMap"
+            width="100%"
+            height="350"
+            style="border:0;border-radius:10px;"
+            loading="lazy"
+            allowfullscreen>
+        </iframe>
 
-<button id="directionsBtn" class="details-btn">
-    📍 Get Directions
-</button>
+        <br><br>
+
+        <button id="directionsBtn" class="details-btn">
+            📍 Get Directions
+        </button>
+
         <button id="whatsappBtn" class="whatsapp-btn">
             Contact on WhatsApp
         </button>
@@ -71,90 +64,93 @@
         <button id="viewingBtn" class="details-btn">
             Book Viewing
         </button>
-<h3>Nearby Places</h3>
 
-<div id="nearbyPlaces" class="features">
+        <h3>Nearby Places</h3>
 
-    <div class="feature">
-        <h4>🏫 Schools</h4>
-        <p id="nearbySchools">Loading...</p>
-    </div>
+        <div class="features">
 
-    <div class="feature">
-        <h4>🏥 Hospitals</h4>
-        <p id="nearbyHospitals">Loading...</p>
-    </div>
+            <div class="feature">
+                <h4>🏫 Schools</h4>
+                <p>Schools near this property.</p>
+            </div>
 
-    <div class="feature">
-        <h4>🛒 Supermarkets</h4>
-        <p id="nearbySupermarkets">Loading...</p>
-    </div>
+            <div class="feature">
+                <h4>🏥 Hospitals</h4>
+                <p>Hospitals nearby.</p>
+            </div>
 
-    <div class="feature">
-        <h4>🛍️ Shopping Malls</h4>
-        <p id="nearbyMalls">Loading...</p>
-    </div>
+            <div class="feature">
+                <h4>🛒 Supermarkets</h4>
+                <p>Supermarkets nearby.</p>
+            </div>
 
-</div>
-        
+            <div class="feature">
+                <h4>🛍️ Shopping Malls</h4>
+                <p>Shopping malls nearby.</p>
+            </div>
+
+        </div>
+
     </div>
 
 </section>
-    
-    <script>
+
+<script>
+
 const property = JSON.parse(localStorage.getItem("selectedProperty"));
 
-if (property) {
+if (!property) {
+
+    alert("No property selected.");
+
+    window.location.href = "index.html";
+
+} else {
 
     document.getElementById("propertyTitle").innerText =
-        property.title;
-    const map = document.getElementById("propertyMap");
+        property.title || "No Title";
 
-map.src =
-    "https://www.google.com/maps?q=" +
-    encodeURIComponent(property.location) +
-    "&output=embed";
-
-document.getElementById("directionsBtn").addEventListener("click", () => {
-
-    window.open(
-        "https://www.google.com/maps/search/?api=1&query=" +
-        encodeURIComponent(property.location),
-        "_blank"
-    );
-});
-document.getElementById("directionsBtn").addEventListener("click", () => {
-
-    window.open(
-        "https://www.google.com/maps/search/?api=1&query=" +
-        encodeURIComponent(property.location),
-        "_blank"
-    );
-
-});
     document.getElementById("propertyLocation").innerText =
-        property.location;
+        "📍 " + (property.location || "Unknown Location");
 
-     document.getElementById("propertyPrice").innerText =
-    "KSh " + property.price + "/month";
+    document.getElementById("propertyPrice").innerText =
+        "KSh " + (property.price || "0") + "/month";
 
     document.getElementById("propertyDescription").innerText =
-        property.description;
+        property.description || "No description available.";
 
-    if (property.image) {
-        document.getElementById("propertyImage").src =
-            property.image;
-    }
+    document.getElementById("propertyImage").src =
+        property.image || "https://picsum.photos/800/500";
+
+    document.getElementById("propertyMap").src =
+        "https://www.google.com/maps?q=" +
+        encodeURIComponent(property.location) +
+        "&output=embed";
+
+    document.getElementById("directionsBtn").onclick = function () {
+
+        window.open(
+            "https://www.google.com/maps/search/?api=1&query=" +
+            encodeURIComponent(property.location),
+            "_blank"
+        );
+
+    };
 
 }
 
-document.getElementById("whatsappBtn").addEventListener("click", () => {
-    window.open("https://wa.me/254799520544", "_blank");
-});
+document.getElementById("whatsappBtn").onclick = function () {
 
-document.getElementById("viewingBtn").addEventListener("click", () => {
+    window.open("https://wa.me/254799520544", "_blank");
+
+};
+
+document.getElementById("viewingBtn").onclick = function () {
+
     alert("Viewing request received! We will contact you shortly.");
-});
+
+};
+
 </script>
 
 </body>

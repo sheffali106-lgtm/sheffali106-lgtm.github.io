@@ -1,88 +1,110 @@
 import { app, db } from "./firebase.js";
 
 import {
-  getAuth,
-  onAuthStateChanged
+    getAuth,
+    onAuthStateChanged,
+    signOut
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
 import {
-  collection,
-  getDocs,
-  deleteDoc,
-  doc
+    collection,
+    query,
+    where,
+    getDocs,
+    deleteDoc,
+    doc
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const auth = getAuth(app);
 const dashboard = document.getElementById("dashboardProperties");
 
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
 
-  if (!user) {
-    window.location.href = "login.html";
-    return;
-  }
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
 
-  loadProperties();
+    loadProperties(user.uid);
 
 });
 
-async function loadProperties() {
+async function loadProperties(ownerId) {
 
-  dashboard.innerHTML = "<p>Loading properties...</p>";
+    dashboard.innerHTML = "<p>Loading properties...</p>";
 
-  try {
+    try {
 
-    const snapshot = await getDocs(collection(db, "properties"));
+        const q = query(
+            collection(db, "properties"),
+            where("ownerId", "==", ownerId)
+        );
 
-    dashboard.innerHTML = "";
+        const snapshot = await getDocs(q);
 
-    if (snapshot.empty) {
-      dashboard.innerHTML = "<p>No properties found.</p>";
-      return;
+        dashboard.innerHTML = "";
+
+        if (snapshot.empty) {
+            dashboard.innerHTML = `
+                <p>You haven't listed any properties yet.</p>
+            `;
+            return;
+        }
+
+        snapshot.forEach((property) => {
+
+            const data = property.data();
+
+            dashboard.innerHTML += `
+                <div class="card">
+
+                    <img src="${data.image}" alt="${data.title}">
+
+                    <h3>${data.title}</h3>
+
+                    <p>${data.location}</p>
+
+                    <p>KSh ${data.price}/month</p>
+
+                    <button class="btn">
+                        Edit
+                    </button>
+
+                    <button class="btn delete-btn"
+                        onclick="deleteProperty('${property.id}')">
+                        Delete
+                    </button>
+
+                </div>
+            `;
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        dashboard.innerHTML =
+            "<p>Failed to load properties.</p>";
+
     }
-
-    snapshot.forEach((property) => {
-
-      const data = property.data();
-
-      dashboard.innerHTML += `
-        <div class="card">
-
-          <img src="${data.image}" alt="${data.title}">
-
-          <h3>${data.title}</h3>
-
-          <p><strong>Location:</strong> ${data.location}</p>
-
-          <p><strong>Price:</strong> KSh ${data.price}</p>
-
-          <button class="btn">Edit</button>
-
-          <button class="btn delete-btn"
-            onclick="deleteProperty('${property.id}')">
-            Delete
-          </button>
-
-        </div>
-      `;
-
-    });
-
-  } catch (error) {
-
-    dashboard.innerHTML = "<p>Error loading properties.</p>";
-    console.error(error);
-
-  }
 
 }
 
 window.deleteProperty = async function(id) {
 
-  if (!confirm("Delete this property?")) return;
+    if (!confirm("Delete this property?")) return;
 
-  await deleteDoc(doc(db, "properties", id));
+    await deleteDoc(doc(db, "properties", id));
 
-  loadProperties();
+    location.reload();
+
+};
+
+window.logout = async function() {
+
+    await signOut(auth);
+
+    window.location.href = "login.html";
 
 };

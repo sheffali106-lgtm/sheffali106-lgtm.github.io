@@ -29,13 +29,13 @@ async function loadProperties() {
 
       console.log("Property loaded:", documentSnapshot.id, property);
 
-      // FIXED: Check for alternative field names (rooms vs bedrooms, etc)
-      const title = property.title || "Rental Property";
-      const location = property.location || property.area || property.town || "Location unavailable";
-      const rooms = property.rooms || property.bedrooms || property.beds || "N/A";
-      const price = property.price || property.rent || "Price not available";
-      const description = property.description || property.desc || "No description available.";
-      const image = property.image || property.imageUrl || property.photo || "https://picsum.photos/800/500";
+      // FIXED: Trim and handle empty strings from Firestore
+      const title = (property.title || "").toString().trim() || "Rental Property";
+      const location = (property.location || "").toString().trim() || "Location unavailable";
+      const rooms = (property.rooms || "").toString().trim() || "N/A";
+      const price = (property.price || "").toString().trim() || "Price not available";
+      const description = (property.description || "").toString().trim() || "No description available.";
+      const image = (property.image || "").toString().trim() || "https://picsum.photos/800/500";
 
       const card = document.createElement("div");
       card.className = "card";
@@ -53,7 +53,6 @@ async function loadProperties() {
         </div>
       `;
 
-      // WHATSAPP BUTTON
       const whatsappButton = card.querySelector(".whatsapp-btn");
       whatsappButton.addEventListener("click", () => {
         const message = `Hello, I am interested in ${title} in ${location}.`;
@@ -61,10 +60,8 @@ async function loadProperties() {
         window.open(whatsappURL, "_blank");
       });
 
-      // VIEW DETAILS BUTTON - FIXED
       const detailsButton = card.querySelector(".details-btn");
       detailsButton.addEventListener("click", () => {
-        // Save to localStorage as backup
         localStorage.setItem(
           "selectedProperty",
           JSON.stringify({
@@ -77,8 +74,6 @@ async function loadProperties() {
             image: image
           })
         );
-
-        // FIXED: Now pass the ID in the URL
         window.location.href = `property.html?id=${documentSnapshot.id}`;
       });
 
@@ -93,9 +88,7 @@ async function loadProperties() {
 
 loadProperties();
 
-// ===============================
-// SEARCH (unchanged)
-// ===============================
+// SEARCH PROPERTIES (unchanged)
 window.searchProperties = function () {
   const locationInput = document.getElementById("searchLocation");
   const roomsInput = document.getElementById("searchRooms");
@@ -123,10 +116,6 @@ window.searchProperties = function () {
         }
       }
     }
-    if (matchesLocation && matchesRooms && matchesPrice) {
-      card.style.display = "";
-    } else {
-      card.style.display = "none";
-    }
+    card.style.display = (matchesLocation && matchesRooms && matchesPrice) ? "" : "none";
   });
 };

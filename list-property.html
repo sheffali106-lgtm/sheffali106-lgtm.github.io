@@ -10,28 +10,50 @@
 
 <nav class="navbar">
     <div class="logo">🏠 RentEasy Kenya</div>
+
     <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="index.html#properties">Properties</a></li>
         <li><a href="list-property.html">List Property</a></li>
+        <li><a href="dashboard.html">Dashboard</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="contact.html">Contact</a></li>
     </ul>
 </nav>
 
 <section style="max-width:700px; margin:40px auto; padding:20px;">
+
     <h2>List Your Property</h2>
-    <p>Fill the form below to add a new rental property</p>
+
+    <p>Fill the form below to add a new rental property.</p>
 
     <form id="propertyForm" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
 
-        <input type="text" id="title" placeholder="Property Title e.g. Modern 2 bedroom apartment" required>
+        <input
+            type="text"
+            id="title"
+            placeholder="Property Title"
+            required>
 
-        <input type="text" id="location" placeholder="Location e.g. Kileleshwa, Nairobi" required>
+        <input
+            type="text"
+            id="location"
+            placeholder="Location"
+            required>
 
-        <input type="number" id="bedrooms" placeholder="Number of Bedrooms e.g. 2" min="1" max="20" required>
+        <input
+            type="number"
+            id="bedrooms"
+            placeholder="Bedrooms"
+            min="1"
+            required>
 
-        <input type="number" id="price" placeholder="Price per month e.g. 65000" min="100" required>
+        <input
+            type="number"
+            id="price"
+            placeholder="Monthly Rent"
+            min="100"
+            required>
 
         <select id="type" required>
             <option value="">Select Property Type</option>
@@ -43,16 +65,27 @@
             <option>Shop</option>
         </select>
 
-        <input type="tel" id="phone" placeholder="Contact Phone e.g. 0712345678" required>
+        <input
+            type="tel"
+            id="phone"
+            placeholder="Contact Phone"
+            required>
 
-        <input type="text" id="amenities" placeholder="Amenities e.g. Parking, CCTV, WiFi, Borehole">
+        <input
+            type="text"
+            id="amenities"
+            placeholder="Amenities">
 
-        <label style="display:flex; align-items:center; gap:10px;">
+        <label>
             <input type="checkbox" id="featured">
             ⭐ Feature this property
         </label>
 
-        <textarea id="description" placeholder="Property Description" rows="4" required></textarea>
+        <textarea
+            id="description"
+            rows="4"
+            placeholder="Property Description"
+            required></textarea>
 
         <input
             type="text"
@@ -66,17 +99,18 @@
         <div id="formMessage"></div>
 
     </form>
+
 </section>
 
 <footer>
     <p>&copy; 2026 RentEasy Kenya. All Rights Reserved.</p>
 </footer>
 
-<script type="module">
-import { app, db } from "./firebase.js";
+<script type="module">import { app, db } from "./firebase.js";
 
 import {
-    getAuth
+    getAuth,
+    onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
 import {
@@ -87,20 +121,36 @@ import {
 
 const auth = getAuth(app);
 
-if (!auth.currentUser) {
-    window.location.href = "login.html";
-}
-
 const form = document.getElementById("propertyForm");
 const messageDiv = document.getElementById("formMessage");
 
+let currentUser = null;
+
+onAuthStateChanged(auth, (user) => {
+
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    currentUser = user;
+
+});
+
 form.addEventListener("submit", async (e) => {
+
     e.preventDefault();
+
+    if (!currentUser) {
+        messageDiv.innerHTML = "<p style='color:red;'>Please wait...</p>";
+        return;
+    }
 
     const title = document.getElementById("title").value.trim();
     const location = document.getElementById("location").value.trim();
-    const bedroomsValue = document.getElementById("bedrooms").value.trim();
-    const priceValue = document.getElementById("price").value.trim();
+    const bedrooms = parseInt(document.getElementById("bedrooms").value);
+    const price = parseInt(document.getElementById("price").value);
+
     const type = document.getElementById("type").value;
     const phone = document.getElementById("phone").value.trim();
     const amenities = document.getElementById("amenities").value.trim();
@@ -110,26 +160,24 @@ form.addEventListener("submit", async (e) => {
     const imageInput = document.getElementById("image").value.trim();
 
     const images = imageInput
-        ? imageInput.split(",").map(url => url.trim()).filter(url => url !== "")
+        ? imageInput.split(",").map(url => url.trim()).filter(url => url)
         : ["https://picsum.photos/800/500"];
-
-    const image = images[0];
 
     try {
 
         await addDoc(collection(db, "properties"), {
 
-            ownerId: auth.currentUser.uid,
-            ownerEmail: auth.currentUser.email,
+            ownerId: currentUser.uid,
+            ownerEmail: currentUser.email,
 
             title,
             location,
 
-            rooms: parseInt(bedroomsValue),
-            bedrooms: parseInt(bedroomsValue),
+            rooms: bedrooms,
+            bedrooms,
 
-            price: parseInt(priceValue),
-            rent: parseInt(priceValue),
+            price,
+            rent: price,
 
             type,
             phone,
@@ -138,15 +186,16 @@ form.addEventListener("submit", async (e) => {
 
             description,
 
-            image,
-            imageUrl: image,
+            image: images[0],
+            imageUrl: images[0],
             images,
 
             createdAt: serverTimestamp()
 
         });
 
-        messageDiv.innerHTML = "<p style='color:green;'>✅ Property listed successfully!</p>";
+        messageDiv.innerHTML =
+            "<p style='color:green;'>✅ Property listed successfully!</p>";
 
         form.reset();
 
@@ -156,7 +205,10 @@ form.addEventListener("submit", async (e) => {
 
     } catch (error) {
 
-        messageDiv.innerHTML = `<p style="color:red;">${error.message}</p>`;
+        console.error(error);
+
+        messageDiv.innerHTML =
+            `<p style="color:red;">${error.message}</p>`;
 
     }
 

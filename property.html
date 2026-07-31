@@ -126,6 +126,48 @@ if (!id) {
                 </div>
 
                 <br><br>
+<hr style="margin:40px 0;">
+
+<h2>📅 Book a Viewing</h2>
+
+<form id="bookingForm" style="display:flex;flex-direction:column;gap:15px;max-width:500px;">
+
+    <input
+        type="text"
+        id="viewerName"
+        placeholder="Your Full Name"
+        required>
+
+    <input
+        type="tel"
+        id="viewerPhone"
+        placeholder="Your Phone Number"
+        required>
+
+    <input
+        type="date"
+        id="viewingDate"
+        required>
+
+    <input
+        type="time"
+        id="viewingTime"
+        required>
+
+    <textarea
+        id="viewerMessage"
+        rows="4"
+        placeholder="Optional message to the landlord"></textarea>
+
+    <button
+        type="submit"
+        style="background:#25D366;color:white;border:none;padding:12px;border-radius:6px;cursor:pointer;">
+        Book Viewing
+    </button>
+
+</form>
+
+<div id="bookingMessage" style="margin-top:15px;"></div>
 
                 <a href="index.html" style="color:#25D366;">← Back to listings</a>
 

@@ -1,192 +1,109 @@
 import { db } from "./firebase.js";
-import {
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-const WHATSAPP_NUMBER = "254799520544";
+const propertiesContainer = document.getElementById('propertiesContainer') || document.getElementById('propertyList');
+const searchInput = document.getElementById('searchInput') || document.querySelector('input[type="search"]') || document.querySelector('#search');
+const searchBtn = document.getElementById('searchBtn');
 
-// ===============================
-// LOAD PROPERTIES
-// ===============================
-async function loadProperties() {
-  const container = document.getElementById("dynamicProperties");
-  if (!container) return;
+let allProperties = [];
 
-  container.innerHTML = `<p style="text-align:center;">Loading properties...</p>`;
-
-  try {
-    const snapshot = await getDocs(collection(db, "properties"));
-    container.innerHTML = "";
-
-    if (snapshot.empty) {
-      container.innerHTML = `<div style="text-align:center;"><h3>No properties available.</h3><p>Check again later.</p></div>`;
-      return;
+// RENDER FUNCTION - handles both field names
+function renderProperties(properties) {
+    if (!propertiesContainer) return;
+    
+    if (properties.length === 0) {
+        propertiesContainer.innerHTML = `<p style="text-align:center; padding:40px;">No properties found. Try a different search.</p>`;
+        return;
     }
 
-    // NEW: Convert Firestore docs to an array and sort featured properties first
-    const properties = [];
-    snapshot.forEach((docSnap) => {
-      properties.push({
-        id: docSnap.id,
-        ...docSnap.data()
-      });
-    });
+    propertiesContainer.innerHTML = properties.map(prop => {
+        const location = prop.location || prop.area || prop.town || "Location unavailable";
+        const rooms = prop.rooms || prop.bedrooms || prop.beds || "N/A";
+        const price = prop.price || prop.rent || 0;
+        const formattedPrice = typeof price === 'number' ? price.toLocaleString() : price;
+        const image = prop.image || prop.imageUrl || prop.photo || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800";
+        const title = prop.title || "Rental Property";
+        const id = prop.id;
 
-    properties.sort((a, b) => {
-      return (b.featured === true) - (a.featured === true);
-    });
-
-    properties.forEach((property) => {
-
-      console.log("Property loaded:", property.id, property);
-
-      const title = (property.title || "").toString().trim() || "Rental Property";
-      const location = (property.location || "").toString().trim() || "Location unavailable";
-      const rooms = (property.rooms || "").toString().trim() || "N/A";
-      const price = (property.price || "").toString().trim() || "Price not available";
-      const description = (property.description || "").toString().trim() || "No description available.";
-      const image = (property.image || "").toString().trim() || "https://picsum.photos/800/500";
-      const type = (property.type || "").toString().trim() || "Property";
-      const featured = property.featured === true;
-
-      const card = document.createElement("div");
-      card.className = "card";
-
-      card.innerHTML = `
-        <img src="${image}" alt="${title}" onerror="this.src='https://picsum.photos/800/500'">
-
-        ${
-          featured
-          ? `<div style="
-                background:#FFD700;
-                color:#000;
-                padding:8px;
-                text-align:center;
-                font-weight:bold;">
-                ⭐ FEATURED
-             </div>`
-          : ""
-        }
-
-        <div class="card-content">
-          <h3>${title}</h3>
-          <p>🏢 ${type}</p>
-          <p>📍 ${location}</p>
-          <p>🛏️ ${rooms} Bedrooms</p>
-          <p class="price">KSh ${price}/month</p>
-          <p>${description}</p>
-
-          <button class="whatsapp-btn">Contact on WhatsApp</button>
-          <button class="details-btn">View Details</button>
+        return `
+        <div class="property-card">
+            <img src="${image}" alt="${title}" loading="lazy">
+            <div class="property-info">
+                <h3>${title}</h3>
+                <p>📍 ${location}</p>
+                <p>🛏️ ${rooms} Bedrooms</p>
+                <p><strong>KSh ${formattedPrice}/month</strong></p>
+                <a href="property.html?id=${id}" class="btn">View Details</a>
+            </div>
         </div>
-      `;
-
-      const whatsappButton = card.querySelector(".whatsapp-btn");
-      whatsappButton.addEventListener("click", () => {
-        const message = `Hello, I am interested in ${title} in ${location}.`;
-        const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-        window.open(whatsappURL, "_blank");
-      });
-
-      const detailsButton = card.querySelector(".details-btn");
-      detailsButton.addEventListener("click", () => {
-        localStorage.setItem(
-          "selectedProperty",
-          JSON.stringify({
-            id: property.id,
-            title,
-            location,
-            rooms,
-            price,
-            description,
-            image
-          })
-        );
-
-        window.location.href = `property.html?id=${property.id}`;
-      });
-
-      container.appendChild(card);
-    });
-
-  } catch (error) {
-    console.error("Firestore Error:", error);
-    container.innerHTML = `<div style="text-align:center; padding:30px;"><h3 style="color:red;">Failed to load properties.</h3><p>Please try again later.</p></div>`;
-  }
+        `;
+    }).join('');
 }
 
-loadProperties();
+// FETCH FROM FIREBASE
+async function loadProperties() {
+    try {
+        if (propertiesContainer) propertiesContainer.innerHTML = "<p style='text-align:center;'>Loading properties...</p>";
+        
+        const querySnapshot = await getDocs(collection(db, "properties"));
+        allProperties = [];
+        
+        querySnapshot.forEach((doc) => {
+            allProperties.push({ id: doc.id, ...doc.data() });
+        });
 
-// ===============================
-// SEARCH PROPERTIES
-// ===============================
-window.searchProperties = function () {
+        // Sort by newest first
+        allProperties.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        
+        renderProperties(allProperties);
+    } catch (error) {
+        console.error("Error loading properties:", error);
+        if (propertiesContainer) propertiesContainer.innerHTML = `<p style='color:red; text-align:center;'>Failed to load properties: ${error.message}</p>`;
+    }
+}
 
-  const location =
-    document.getElementById("searchLocation")?.value.trim().toLowerCase() || "";
-
-  const type =
-    document.getElementById("searchType")?.value.trim().toLowerCase() || "";
-
-  const bedrooms =
-    document.getElementById("searchBedrooms")?.value || "";
-
-  const maxPrice =
-    document.getElementById("searchPrice")?.value || "";
-
-  const cards = document.querySelectorAll(".card");
-
-  cards.forEach((card) => {
-
-    const text = card.innerText.toLowerCase();
-
-    const matchesLocation =
-      location === "" || text.includes(location);
-
-    const matchesType =
-      type === "" || text.includes(type);
-
-    let matchesBedrooms = true;
-
-    if (bedrooms !== "") {
-      matchesBedrooms =
-        text.includes(`${bedrooms} bedroom`) ||
-        text.includes(`${bedrooms} bedrooms`);
+// SEARCH FUNCTION - THIS IS THE FIX FOR OPTION 1
+function handleSearch() {
+    if (!searchInput) return;
+    
+    const query = searchInput.value.toLowerCase().trim();
+    
+    if (!query) {
+        renderProperties(allProperties);
+        return;
     }
 
-    let matchesPrice = true;
+    const filtered = allProperties.filter(p => {
+        const title = (p.title || "").toLowerCase();
+        const location = (p.location || p.area || p.town || "").toLowerCase();
+        const description = (p.description || p.desc || "").toLowerCase();
+        const price = String(p.price || p.rent || "").toLowerCase();
+        const rooms = String(p.rooms || p.bedrooms || "").toLowerCase();
 
-    if (maxPrice !== "") {
-      const priceElement = card.querySelector(".price");
+        return title.includes(query) || 
+               location.includes(query) || 
+               description.includes(query) ||
+               price.includes(query) ||
+               rooms.includes(query);
+    });
 
-      if (priceElement) {
-        const priceText = priceElement.innerText.replace(/[^0-9]/g, "");
-        const price = parseInt(priceText, 10);
+    renderProperties(filtered);
+}
 
-        if (!isNaN(price)) {
-          matchesPrice = price <= parseInt(maxPrice, 10);
-        }
-      }
-    }
-
-    card.style.display =
-      (matchesLocation &&
-       matchesType &&
-       matchesBedrooms &&
-       matchesPrice)
-        ? ""
-        : "none";
-
-  });
-
-};
-
-// ===============================
-// SEARCH BUTTON
-// ===============================
-const searchBtn = document.getElementById("searchBtn");
+// EVENT LISTENERS
+if (searchInput) {
+    searchInput.addEventListener('input', handleSearch); // Live search as you type
+    searchInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') handleSearch();
+    });
+}
 
 if (searchBtn) {
-  searchBtn.addEventListener("click", window.searchProperties);
+    searchBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        handleSearch();
+    });
 }
+
+// INITIAL LOAD
+loadProperties();

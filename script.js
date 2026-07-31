@@ -1,142 +1,122 @@
 import { db } from "./firebase.js";
-
 import {
-    collection,
-    getDocs
+  collection,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 async function loadProperties() {
+  const container = document.getElementById("dynamicProperties");
 
-    const container = document.getElementById("dynamicProperties");
+  if (!container) return;
 
-    if (!container) return;
+  container.innerHTML = "";
 
-    container.innerHTML = "";
+  try {
+    const snapshot = await getDocs(collection(db, "properties"));
 
-    try {
-
-        const snapshot = await getDocs(collection(db, "properties"));
-
-        snapshot.forEach((doc) => {
-
-            const property = doc.data();
-
-            console.log("Property:", property);
-
-            // DEBUG
-            alert(JSON.stringify(property));
-
-            const card = document.createElement("div");
-
-            card.className = "card";
-
-            card.innerHTML = `
-                <img src="${property.image || 'https://picsum.photos/400/250'}" alt="${property.title}">
-
-                <div class="card-content">
-
-                    <h3>${property.title}</h3>
-
-                    <p>📍 ${property.location}</p>
-
-                    <p>🛏️ ${property.rooms} Bedrooms</p>
-
-                    <p class="price">KSh ${property.price}/month</p>
-
-                    <p>${property.description}</p>
-
-                    <button class="whatsapp-btn">
-                        Contact on WhatsApp
-                    </button>
-
-                    <button class="details-btn">
-                        View Details
-                    </button>
-
-                </div>
-            `;
-
-            card.querySelector(".whatsapp-btn").addEventListener("click", () => {
-                window.open("https://wa.me/254799520544", "_blank");
-            });
-
-            card.querySelector(".details-btn").addEventListener("click", () => {
-
-                localStorage.setItem(
-                    "selectedProperty",
-                    JSON.stringify(property)
-                );
-
-                window.location.href = "property.html";
-
-            });
-
-            container.appendChild(card);
-
-        });
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(error.message);
-
-        container.innerHTML = `
-            <h3 style="text-align:center;">
-                Unable to load properties.
-            </h3>
-        `;
-
+    if (snapshot.empty) {
+      container.innerHTML = "<h3>No properties found.</h3>";
+      return;
     }
 
+    snapshot.forEach((doc) => {
+      const property = doc.data();
+
+      console.log(property);
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      card.innerHTML = `
+        <img src="${property.image}" alt="${property.title}">
+
+        <div class="card-content">
+
+          <h3>${property.title}</h3>
+
+          <p>📍 ${property.location}</p>
+
+          <p>🛏️ ${property.rooms} Bedrooms</p>
+
+          <p class="price">KSh ${property.price}/month</p>
+
+          <p>${property.description}</p>
+
+          <button class="whatsapp-btn">
+            Contact on WhatsApp
+          </button>
+
+          <button class="details-btn">
+            View Details
+          </button>
+
+        </div>
+      `;
+
+      card.querySelector(".whatsapp-btn").addEventListener("click", () => {
+        window.open("https://wa.me/254799520544", "_blank");
+      });
+
+      card.querySelector(".details-btn").addEventListener("click", () => {
+        localStorage.setItem(
+          "selectedProperty",
+          JSON.stringify(property)
+        );
+
+        window.location.href = "property.html";
+      });
+
+      container.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    container.innerHTML = `
+      <h3 style="text-align:center;color:red;">
+        Failed to load properties.
+      </h3>
+    `;
+  }
 }
 
 loadProperties();
 
 window.searchProperties = function () {
 
-    const location =
-        document.getElementById("searchLocation").value.toLowerCase();
+  const location =
+    document.getElementById("searchLocation")?.value.toLowerCase() || "";
 
-    const rooms =
-        document.getElementById("searchRooms").value;
+  const rooms =
+    document.getElementById("searchRooms")?.value || "";
 
-    const maxPrice =
-        document.getElementById("searchPrice").value;
+  const maxPrice =
+    document.getElementById("searchPrice")?.value || "";
 
-    const cards = document.querySelectorAll(".card");
+  document.querySelectorAll(".card").forEach((card) => {
 
-    cards.forEach((card) => {
+    const text = card.innerText.toLowerCase();
 
-        const text = card.innerText.toLowerCase();
+    const matchesLocation =
+      location === "" || text.includes(location);
 
-        const matchesLocation =
-            location === "" || text.includes(location);
+    const matchesRooms =
+      rooms === "" || text.includes(rooms + " bedroom");
 
-        const matchesRooms =
-            rooms === "" || text.includes(rooms + " bedroom");
+    let matchesPrice = true;
 
-        let matchesPrice = true;
+    if (maxPrice !== "") {
+      const price =
+        parseInt(
+          card.querySelector(".price").innerText.replace(/[^0-9]/g, "")
+        );
 
-        if (maxPrice !== "") {
+      matchesPrice = price <= parseInt(maxPrice);
+    }
 
-            const priceElement = card.querySelector(".price");
-
-            if (!priceElement) return;
-
-            const price =
-                parseInt(priceElement.innerText.replace(/[^0-9]/g, ""));
-
-            matchesPrice = price <= parseInt(maxPrice);
-
-        }
-
-        if (matchesLocation && matchesRooms && matchesPrice) {
-            card.style.display = "";
-        } else {
-            card.style.display = "none";
-        }
-
-    });
-
+    card.style.display =
+      matchesLocation && matchesRooms && matchesPrice
+        ? ""
+        : "none";
+  });
 };

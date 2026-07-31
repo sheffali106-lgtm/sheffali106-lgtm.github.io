@@ -43,7 +43,6 @@ async function load() {
     const snap = await getDocs(collection(db, "properties"));
     allProperties = [];
     snap.forEach(d => allProperties.push({ id: d.id, ...d.data() }));
-    allProperties.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
     render(allProperties);
 }
 
@@ -55,16 +54,10 @@ function doSearch() {
     const maxPrice = parseInt(searchPrice.value);
 
     if (loc) {
-        filtered = filtered.filter(p => {
-            const fullText = `${p.title || ''} ${p.location || ''} ${p.area || ''} ${p.description || ''}`.toLowerCase();
-            return fullText.includes(loc);
-        });
+        filtered = filtered.filter(p => `${p.title || ''} ${p.location || ''} ${p.description || ''}`.toLowerCase().includes(loc));
     }
     if (type) {
-        filtered = filtered.filter(p => {
-            const fullText = `${p.title || ''} ${p.description || ''} ${p.type || ''}`.toLowerCase();
-            return fullText.includes(type);
-        });
+        filtered = filtered.filter(p => `${p.title || ''} ${p.description || ''} ${p.type || ''}`.toLowerCase().includes(type));
     }
     if (beds) {
         filtered = filtered.filter(p => {
@@ -74,19 +67,12 @@ function doSearch() {
         });
     }
     if (!isNaN(maxPrice) && maxPrice > 0) {
-        filtered = filtered.filter(p => {
-            const price = parseInt(p.price || p.rent || 0);
-            return price <= maxPrice;
-        });
+        filtered = filtered.filter(p => parseInt(p.price || p.rent || 0) <= maxPrice);
     }
     render(filtered);
 }
 
-searchBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    doSearch();
-});
-
+searchBtn.addEventListener('click', (e) => { e.preventDefault(); doSearch(); });
 searchLocation.addEventListener('input', doSearch);
 searchType.addEventListener('change', doSearch);
 searchBedrooms.addEventListener('change', doSearch);

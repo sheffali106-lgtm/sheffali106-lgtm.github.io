@@ -33,13 +33,33 @@
 
         <input type="number" id="price" placeholder="Price per month e.g. 65000" min="100" required>
 
+        <!-- NEW -->
+        <select id="type" required>
+            <option value="">Select Property Type</option>
+            <option>Apartment</option>
+            <option>Maisonette</option>
+            <option>Bedsitter</option>
+            <option>Studio</option>
+            <option>Office</option>
+            <option>Shop</option>
+        </select>
+
+        <!-- NEW -->
+        <input type="tel" id="phone" placeholder="Contact Phone e.g. 0712345678" required>
+
+        <!-- NEW -->
+        <input type="text" id="amenities" placeholder="Amenities e.g. Parking, CCTV, WiFi, Borehole">
+
         <textarea id="description" placeholder="Property Description" rows="4" required></textarea>
 
         <input type="url" id="image" placeholder="Image URL (optional) - e.g. https://...">
 
-        <button type="submit" class="btn" style="background:#25D366; color:white; padding:12px; border:none; border-radius:6px; cursor:pointer;">List Property</button>
+        <button type="submit" class="btn" style="background:#25D366; color:white; padding:12px; border:none; border-radius:6px; cursor:pointer;">
+            List Property
+        </button>
 
         <div id="formMessage"></div>
+
     </form>
 </section>
 
@@ -61,10 +81,16 @@ form.addEventListener("submit", async (e) => {
     const location = document.getElementById("location").value.trim();
     const bedroomsValue = document.getElementById("bedrooms").value.trim();
     const priceValue = document.getElementById("price").value.trim();
+
+    // NEW
+    const type = document.getElementById("type").value;
+    const phone = document.getElementById("phone").value.trim();
+    const amenities = document.getElementById("amenities").value.trim();
+
     const description = document.getElementById("description").value.trim();
     const image = document.getElementById("image").value.trim();
 
-    if (!title || !location || !bedroomsValue || !priceValue || !description) {
+    if (!title || !location || !bedroomsValue || !priceValue || !type || !phone || !description) {
         messageDiv.innerHTML = `<p style="color:red;">Please fill all required fields</p>`;
         return;
     }
@@ -77,23 +103,37 @@ form.addEventListener("submit", async (e) => {
     btn.innerText = "Listing...";
 
     try {
-        // CORRECT MAPPING - NO SWAP
+
         await addDoc(collection(db, "properties"), {
             title: title,
             location: location,
+
             rooms: rooms,
             bedrooms: rooms,
+
             price: price,
             rent: price,
+
+            // NEW
+            type: type,
+            phone: phone,
+            amenities: amenities,
+
             description: description,
+
             image: image || "https://picsum.photos/800/500",
             imageUrl: image || "https://picsum.photos/800/500",
+
             createdAt: serverTimestamp()
         });
 
         messageDiv.innerHTML = `<p style="color:green;">✅ Property listed successfully!</p>`;
+
         form.reset();
-        setTimeout(() => { window.location.href = "index.html"; }, 1500);
+
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 1500);
 
     } catch (error) {
         console.error(error);

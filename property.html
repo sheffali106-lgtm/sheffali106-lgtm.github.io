@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Property Details | RentEasy Kenya</title>
 
     <link rel="stylesheet" href="style.css">
@@ -12,144 +13,197 @@
 <body>
 
 <nav class="navbar">
-    <div class="logo">🏠 RentEasy Kenya</div>
+
+    <div class="logo">
+        🏠 RentEasy Kenya
+    </div>
 
     <ul class="nav-links">
-        <li><a href="index.html">← Back to Home</a></li>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#properties">Properties</a></li>
+        <li><a href="list-property.html">List Property</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
     </ul>
+
 </nav>
+
 
 <section class="property-details">
 
-    <div class="gallery">
+    <div id="propertyContainer">
 
-        <img
-            id="propertyImage"
-            src="https://picsum.photos/800/500"
-            alt="Property Image">
-
-    </div>
-
-    <div class="card-content">
-
-        <h1 id="propertyTitle">Loading...</h1>
-
-        <p id="propertyLocation"></p>
-
-        <h2 id="propertyPrice"></h2>
-
-        <p id="propertyDescription"></p>
-
-        <h3>Location</h3>
-
-        <iframe
-            id="propertyMap"
-            width="100%"
-            height="350"
-            style="border:0;border-radius:10px;"
-            loading="lazy"
-            allowfullscreen>
-        </iframe>
-
-        <br><br>
-
-        <button id="directionsBtn" class="details-btn">
-            📍 Get Directions
-        </button>
-
-        <button id="whatsappBtn" class="whatsapp-btn">
-            Contact on WhatsApp
-        </button>
-
-        <button id="viewingBtn" class="details-btn">
-            Book Viewing
-        </button>
-
-        <h3>Nearby Places</h3>
-
-        <div class="features">
-
-            <div class="feature">
-                <h4>🏫 Schools</h4>
-                <p>Schools near this property.</p>
-            </div>
-
-            <div class="feature">
-                <h4>🏥 Hospitals</h4>
-                <p>Hospitals nearby.</p>
-            </div>
-
-            <div class="feature">
-                <h4>🛒 Supermarkets</h4>
-                <p>Supermarkets nearby.</p>
-            </div>
-
-            <div class="feature">
-                <h4>🛍️ Shopping Malls</h4>
-                <p>Shopping malls nearby.</p>
-            </div>
-
-        </div>
+        <p>Loading property...</p>
 
     </div>
 
 </section>
 
+
+<footer>
+
+    <p>&copy; 2026 RentEasy Kenya. All Rights Reserved.</p>
+
+</footer>
+
+
 <script>
 
-const property = JSON.parse(localStorage.getItem("selectedProperty"));
+const propertyData =
+    localStorage.getItem("selectedProperty");
 
-if (!property) {
+const container =
+    document.getElementById("propertyContainer");
 
-    alert("No property selected.");
 
-    window.location.href = "index.html";
+if (!propertyData) {
+
+    container.innerHTML = `
+        <h2>Property not found</h2>
+
+        <p>
+            Please go back to the properties page
+            and select a property again.
+        </p>
+
+        <a href="index.html" class="btn">
+            Back to Properties
+        </a>
+    `;
 
 } else {
 
-    document.getElementById("propertyTitle").innerText =
-        property.title || "No Title";
+    try {
 
-    document.getElementById("propertyLocation").innerText =
-        "📍 " + (property.location || "Unknown Location");
+        const property =
+            JSON.parse(propertyData);
 
-    document.getElementById("propertyPrice").innerText =
-        "KSh " + (property.price || "0") + "/month";
+        container.innerHTML = `
 
-    document.getElementById("propertyDescription").innerText =
-        property.description || "No description available.";
+            <div class="property-card">
 
-    document.getElementById("propertyImage").src =
-        property.image || "https://picsum.photos/800/500";
+                <img
+                    src="${property.image || 'https://picsum.photos/800/500'}"
+                    alt="${property.title || 'Rental property'}"
+                    class="property-image"
+                >
 
-    document.getElementById("propertyMap").src =
-        "https://www.google.com/maps?q=" +
-        encodeURIComponent(property.location) +
-        "&output=embed";
+                <div class="property-content">
 
-    document.getElementById("directionsBtn").onclick = function () {
+                    <h1>
+                        ${property.title || "Rental Property"}
+                    </h1>
 
-        window.open(
-            "https://www.google.com/maps/search/?api=1&query=" +
-            encodeURIComponent(property.location),
-            "_blank"
+                    <p class="location">
+                        📍 ${property.location || "Location not available"}
+                    </p>
+
+                    <p class="rooms">
+                        🛏️ ${property.rooms || "N/A"} Bedrooms
+                    </p>
+
+                    <p class="price">
+                        KSh ${property.price || "Price not available"}/month
+                    </p>
+
+                    <h3>Property Description</h3>
+
+                    <p>
+                        ${property.description || "No description available."}
+                    </p>
+
+
+                    <h3>Location</h3>
+
+                    <iframe
+                        src="https://www.google.com/maps?q=${encodeURIComponent(property.location || "Nairobi, Kenya")}&output=embed"
+                        width="100%"
+                        height="300"
+                        style="border:0;"
+                        loading="lazy">
+                    </iframe>
+
+
+                    <div class="property-buttons">
+
+                        <button
+                            class="whatsapp-btn"
+                            onclick="contactWhatsApp()">
+                            Contact on WhatsApp
+                        </button>
+
+                        <button
+                            class="details-btn"
+                            onclick="getDirections()">
+                            📍 Get Directions
+                        </button>
+
+                        <a
+                            href="index.html"
+                            class="btn">
+                            ← Back to Properties
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        window.contactWhatsApp = function () {
+
+            const message =
+                `Hello, I am interested in ${property.title || "this property"} in ${property.location || "Kenya"}.`;
+
+            const url =
+                "https://wa.me/254799520544?text=" +
+                encodeURIComponent(message);
+
+            window.open(url, "_blank");
+
+        };
+
+
+        window.getDirections = function () {
+
+            const location =
+                property.location || "Nairobi, Kenya";
+
+            const url =
+                "https://www.google.com/maps/search/?api=1&query=" +
+                encodeURIComponent(location);
+
+            window.open(url, "_blank");
+
+        };
+
+    } catch (error) {
+
+        console.error(
+            "Error loading property:",
+            error
         );
 
-    };
+        container.innerHTML = `
+
+            <h2>Unable to load property</h2>
+
+            <p>
+                There was a problem loading this property.
+            </p>
+
+            <a href="index.html" class="btn">
+                Back to Properties
+            </a>
+
+        `;
+
+    }
 
 }
-
-document.getElementById("whatsappBtn").onclick = function () {
-
-    window.open("https://wa.me/254799520544", "_blank");
-
-};
-
-document.getElementById("viewingBtn").onclick = function () {
-
-    alert("Viewing request received! We will contact you shortly.");
-
-};
 
 </script>
 

@@ -1,27 +1,108 @@
-form.addEventListener("submit", async function(event) {
-    event.preventDefault();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Property | RentEasy Kenya</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">🏠 RentEasy Kenya</div>
+    <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#properties">Properties</a></li>
+        <li><a href="list-property.html">List Property</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+</nav>
+
+<section style="max-width:700px; margin:40px auto; padding:20px;">
+    <h2>List Your Property</h2>
+    <p>Fill the form below to add a new rental property</p>
+
+    <form id="propertyForm" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
+
+        <input type="text" id="title" placeholder="Property Title e.g. Modern 2 bedroom apartment" required>
+
+        <input type="text" id="location" placeholder="Location e.g. Kileleshwa, Nairobi" required>
+
+        <input type="number" id="bedrooms" placeholder="Number of Bedrooms e.g. 2" min="1" max="20" required>
+
+        <input type="number" id="price" placeholder="Price per month e.g. 65000" min="100" required>
+
+        <textarea id="description" placeholder="Property Description" rows="4" required></textarea>
+
+        <input type="url" id="image" placeholder="Image URL (optional) - e.g. https://...">
+
+        <button type="submit" class="btn" style="background:#25D366; color:white; padding:12px; border:none; border-radius:6px; cursor:pointer;">List Property</button>
+
+        <div id="formMessage"></div>
+    </form>
+</section>
+
+<footer>
+    <p>&copy; 2026 RentEasy Kenya. All Rights Reserved.</p>
+</footer>
+
+<script type="module">
+import { db } from "./firebase.js";
+import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+const form = document.getElementById("propertyForm");
+const messageDiv = document.getElementById("formMessage");
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
     const title = document.getElementById("title").value.trim();
     const location = document.getElementById("location").value.trim();
-    const rooms = document.getElementById("rooms").value.trim();
-    const price = document.getElementById("price").value.trim();
-    const image = document.getElementById("image").value.trim();
+    const bedroomsValue = document.getElementById("bedrooms").value.trim();
+    const priceValue = document.getElementById("price").value.trim();
     const description = document.getElementById("description").value.trim();
+    const image = document.getElementById("image").value.trim();
 
-    if(!rooms || !price){
-        message.textContent = "❌ Bedrooms and Price cannot be empty";
+    if (!title || !location || !bedroomsValue || !priceValue || !description) {
+        messageDiv.innerHTML = `<p style="color:red;">Please fill all required fields</p>`;
         return;
     }
 
-    message.textContent = "Adding property...";
+    const rooms = parseInt(bedroomsValue, 10);
+    const price = parseInt(priceValue, 10);
+
+    const btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.innerText = "Listing...";
+
     try {
+        // CORRECT MAPPING - NO SWAP
         await addDoc(collection(db, "properties"), {
-            title, location, rooms, price, image, description,
-            createdAt: new Date()
+            title: title,
+            location: location,
+            rooms: rooms,
+            bedrooms: rooms,
+            price: price,
+            rent: price,
+            description: description,
+            image: image || "https://picsum.photos/800/500",
+            imageUrl: image || "https://picsum.photos/800/500",
+            createdAt: serverTimestamp()
         });
-        message.textContent = "✅ Property added successfully!";
+
+        messageDiv.innerHTML = `<p style="color:green;">✅ Property listed successfully!</p>`;
         form.reset();
+        setTimeout(() => { window.location.href = "index.html"; }, 1500);
+
     } catch (error) {
         console.error(error);
-        message.textContent = "❌ Failed to add property.";
+        messageDiv.innerHTML = `<p style="color:red;">Failed: ${error.message}</p>`;
+        btn.disabled = false;
+        btn.innerText = "List Property";
     }
 });
+</script>
+
+</body>
+</html>

@@ -1,373 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Property Details | RentEasy Kenya</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <nav class="navbar">
-
-    <div class="logo">
-        🏠 RentEasy Kenya
-    </div>
-
+    <div class="logo">🏠 RentEasy Kenya</div>
     <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="index.html#properties">Properties</a></li>
         <li><a href="list-property.html">List Property</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="contact.html">Contact</a></li>
     </ul>
-
 </nav>
 
-
 <section class="property-details">
-
-    <div id="propertyContainer">
-
-        <p>Loading property...</p>
-
-    </div>
-
+    <div id="propertyContainer"><p style="text-align:center;">Loading property...</p></div>
 </section>
 
+<footer><p>&copy; 2026 RentEasy Kenya. All Rights Reserved.</p></footer>
 
-<footer>
+<script type="module">
+import { db } from "./firebase.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-    <p>&copy; 2026 RentEasy Kenya. All Rights Reserved.</p>
+const container = document.getElementById("propertyContainer");
 
-</footer>
+async function loadProperty() {
+  const params = new URLSearchParams(window.location.search);
+  const idFromUrl = params.get('id');
+  
+  let property = null;
+  let propertyId = idFromUrl;
 
-
-<script>
-
-const container =
-    document.getElementById("propertyContainer");
-
-
-// Get the selected property saved by script.js
-const propertyData =
-    localStorage.getItem("selectedProperty");
-
-
-console.log("Selected property:", propertyData);
-
-
-// ===============================
-// CHECK IF PROPERTY EXISTS
-// ===============================
-
-if (!propertyData) {
-
-    container.innerHTML = `
-
-        <div class="property-card">
-
-            <div class="property-content">
-
-                <h2>
-                    Property not found
-                </h2>
-
-                <p>
-                    Please return to the properties page
-                    and select a property again.
-                </p>
-
-                <a
-                    href="index.html"
-                    class="btn">
-
-                    ← Back to Properties
-
-                </a>
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-
-// ===============================
-// LOAD PROPERTY
-// ===============================
-
-else {
-
+  // Try localStorage as backup
+  const localData = localStorage.getItem("selectedProperty");
+  if (localData) {
     try {
-
-        const property =
-            JSON.parse(propertyData);
-
-
-        console.log(
-            "Parsed property:",
-            property
-        );
-
-
-        // ===============================
-        // PROPERTY INFORMATION
-        // ===============================
-
-        const title =
-            property.title ||
-            "Rental Property";
-
-
-        const location =
-            property.location ||
-            "Location not available";
-
-
-        const rooms =
-            property.rooms ||
-            "N/A";
-
-
-        const price =
-            property.price ||
-            "Price not available";
-
-
-        const description =
-            property.description ||
-            "No description available.";
-
-
-        const image =
-            property.image ||
-            "https://picsum.photos/800/500";
-
-
-        // ===============================
-        // DISPLAY PROPERTY
-        // ===============================
-
-        container.innerHTML = `
-
-            <div class="property-card">
-
-
-                <img
-                    src="${image}"
-                    alt="${title}"
-                    class="property-image"
-                    onerror="this.src='https://picsum.photos/800/500'"
-                >
-
-
-                <div class="property-content">
-
-
-                    <h1>
-                        ${title}
-                    </h1>
-
-
-                    <p class="location">
-                        📍 ${location}
-                    </p>
-
-
-                    <p class="rooms">
-                        🛏️ ${rooms} Bedrooms
-                    </p>
-
-
-                    <p class="price">
-                        KSh ${price}/month
-                    </p>
-
-
-                    <h3>
-                        Property Description
-                    </h3>
-
-
-                    <p>
-                        ${description}
-                    </p>
-
-
-                    <h3>
-                        Location
-                    </h3>
-
-
-                    <iframe
-                        src="https://www.google.com/maps?q=${encodeURIComponent(location)}&output=embed"
-                        width="100%"
-                        height="300"
-                        style="border:0;"
-                        loading="lazy"
-                        allowfullscreen>
-                    </iframe>
-
-
-                    <div class="property-buttons">
-
-
-                        <button
-                            class="whatsapp-btn"
-                            id="whatsappButton">
-
-                            Contact on WhatsApp
-
-                        </button>
-
-
-                        <button
-                            class="details-btn"
-                            id="directionsButton">
-
-                            📍 Get Directions
-
-                        </button>
-
-
-                        <a
-                            href="index.html"
-                            class="btn">
-
-                            ← Back to Properties
-
-                        </a>
-
-
-                    </div>
-
-
-                </div>
-
-            </div>
-
-        `;
-
-
-        // ===============================
-        // WHATSAPP
-        // ===============================
-
-        const whatsappButton =
-            document.getElementById(
-                "whatsappButton"
-            );
-
-
-        whatsappButton.addEventListener(
-            "click",
-            function () {
-
-
-                const message =
-                    `Hello, I am interested in ${title} in ${location}.`;
-
-
-                const whatsappURL =
-                    "https://wa.me/254799520544?text=" +
-                    encodeURIComponent(message);
-
-
-                window.open(
-                    whatsappURL,
-                    "_blank"
-                );
-
-
-            }
-        );
-
-
-        // ===============================
-        // GOOGLE MAPS DIRECTIONS
-        // ===============================
-
-        const directionsButton =
-            document.getElementById(
-                "directionsButton"
-            );
-
-
-        directionsButton.addEventListener(
-            "click",
-            function () {
-
-
-                const mapsURL =
-                    "https://www.google.com/maps/search/?api=1&query=" +
-                    encodeURIComponent(location);
-
-
-                window.open(
-                    mapsURL,
-                    "_blank"
-                );
-
-
-            }
-        );
-
-
+      const parsed = JSON.parse(localData);
+      if (!propertyId && parsed.id) propertyId = parsed.id;
+      if (!propertyId) property = parsed;
+    } catch(e) {}
+  }
+
+  // Fetch fresh from Firebase if we have ID
+  if (propertyId) {
+    try {
+      const snap = await getDoc(doc(db, "properties", propertyId));
+      if (snap.exists()) {
+        property = { id: snap.id, ...snap.data() };
+      }
+    } catch(err) {
+      console.error(err);
     }
+  }
 
+  if (!property) {
+    container.innerHTML = `<div style="text-align:center; padding:20px;"><h2>Property not found</h2><p>Please go back to homepage and click View Details again.</p><a href="index.html">← Back</a></div>`;
+    return;
+  }
 
-    catch (error) {
+  // Handles both 'rooms' and 'bedrooms' etc.
+  const title = property.title || "Rental Property";
+  const location = property.location || property.area || "Location unavailable";
+  const rooms = property.rooms || property.bedrooms || "N/A";
+  const price = property.price || "Price not available";
+  const description = property.description || "No description available.";
+  const image = property.image || "https://picsum.photos/800/500";
 
+  container.innerHTML = `
+    <div class="property-card">
+      <img src="${image}" alt="${title}" class="property-image" style="width:100%; max-height:400px; object-fit:cover;" onerror="this.src='https://picsum.photos/800/500'">
+      <div class="property-content" style="padding:15px;">
+        <h1>${title}</h1>
+        <p>📍 ${location}</p>
+        <p>🛏️ ${rooms} Bedrooms</p>
+        <p style="color:blue; font-weight:bold;">KSh ${price}/month</p>
+        <h3>Property Description</h3><p>${description}</p>
+        <h3>Location</h3>
+        <iframe src="https://www.google.com/maps?q=${encodeURIComponent(location)}&output=embed" width="100%" height="300" style="border:0;" loading="lazy"></iframe>
+        <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button id="whatsappButton" style="background:#25D366; color:white; padding:10px 15px; border:none; border-radius:5px;">Contact on WhatsApp</button>
+          <button id="directionsButton" style="background:#007bff; color:white; padding:10px 15px; border:none; border-radius:5px;">📍 Get Directions</button>
+          <a href="index.html" style="background:#198754; color:white; padding:10px 15px; border-radius:5px; text-decoration:none;">← Back to Properties</a>
+        </div>
+      </div>
+    </div>
+  `;
 
-        console.error(
-            "Error loading property:",
-            error
-        );
-
-
-        container.innerHTML = `
-
-            <div class="property-card">
-
-                <div class="property-content">
-
-                    <h2>
-                        Unable to load property
-                    </h2>
-
-                    <p>
-                        There was a problem loading
-                        this property.
-                    </p>
-
-                    <a
-                        href="index.html"
-                        class="btn">
-
-                        ← Back to Properties
-
-                    </a>
-
-                </div>
-
-            </div>
-
-        `;
-
-    }
-
+  document.getElementById("whatsappButton").onclick = () => {
+    window.open(`https://wa.me/254799520544?text=${encodeURIComponent(`Hello, I am interested in ${title} in ${location}.`)}`, "_blank");
+  };
+  document.getElementById("directionsButton").onclick = () => {
+    window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`, "_blank");
+  };
 }
-
+loadProperty();
 </script>
-
-
 </body>
-
 </html>

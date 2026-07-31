@@ -5,42 +5,47 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 async function loadProperties() {
+
   const container = document.getElementById("dynamicProperties");
 
   if (!container) return;
 
-  container.innerHTML = "";
+  container.innerHTML = "<p>Loading properties...</p>";
 
   try {
+
     const snapshot = await getDocs(collection(db, "properties"));
 
+    container.innerHTML = "";
+
     if (snapshot.empty) {
-      container.innerHTML = "<h3>No properties found.</h3>";
+      container.innerHTML = "<h3>No properties available.</h3>";
       return;
     }
 
     snapshot.forEach((doc) => {
+
       const property = doc.data();
 
-      console.log(property);
+      console.log("Loaded Property:", property);
 
       const card = document.createElement("div");
       card.className = "card";
 
       card.innerHTML = `
-        <img src="${property.image}" alt="${property.title}">
+        <img src="${property.image || "https://picsum.photos/400/250"}" alt="${property.title || "Property"}">
 
         <div class="card-content">
 
-          <h3>${property.title}</h3>
+          <h3>${property.title || "No Title"}</h3>
 
-          <p>📍 ${property.location}</p>
+          <p>📍 ${property.location || "Location unavailable"}</p>
 
-          <p>🛏️ ${property.rooms} Bedrooms</p>
+          <p>🛏️ ${property.rooms || "N/A"} Bedrooms</p>
 
-          <p class="price">KSh ${property.price}/month</p>
+          <p class="price">KSh ${property.price || "0"}/month</p>
 
-          <p>${property.description}</p>
+          <p>${property.description || "No description available."}</p>
 
           <button class="whatsapp-btn">
             Contact on WhatsApp
@@ -58,26 +63,32 @@ async function loadProperties() {
       });
 
       card.querySelector(".details-btn").addEventListener("click", () => {
+
         localStorage.setItem(
           "selectedProperty",
           JSON.stringify(property)
         );
 
         window.location.href = "property.html";
+
       });
 
       container.appendChild(card);
+
     });
 
   } catch (error) {
-    console.error(error);
+
+    console.error("Firestore Error:", error);
 
     container.innerHTML = `
-      <h3 style="text-align:center;color:red;">
+      <h3 style="color:red;text-align:center;">
         Failed to load properties.
       </h3>
     `;
+
   }
+
 }
 
 loadProperties();
@@ -93,7 +104,9 @@ window.searchProperties = function () {
   const maxPrice =
     document.getElementById("searchPrice")?.value || "";
 
-  document.querySelectorAll(".card").forEach((card) => {
+  const cards = document.querySelectorAll(".card");
+
+  cards.forEach((card) => {
 
     const text = card.innerText.toLowerCase();
 
@@ -106,17 +119,26 @@ window.searchProperties = function () {
     let matchesPrice = true;
 
     if (maxPrice !== "") {
-      const price =
-        parseInt(
-          card.querySelector(".price").innerText.replace(/[^0-9]/g, "")
+
+      const priceElement = card.querySelector(".price");
+
+      if (priceElement) {
+
+        const price = parseInt(
+          priceElement.innerText.replace(/[^0-9]/g, "")
         );
 
-      matchesPrice = price <= parseInt(maxPrice);
+        matchesPrice = price <= parseInt(maxPrice);
+
+      }
+
     }
 
     card.style.display =
-      matchesLocation && matchesRooms && matchesPrice
+      (matchesLocation && matchesRooms && matchesPrice)
         ? ""
         : "none";
+
   });
+
 };

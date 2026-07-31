@@ -12,13 +12,12 @@
     <div class="logo">🏠 RentEasy Kenya</div>
     <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
-        <li><a href="index.html#properties">Properties</a></li>
         <li><a href="list-property.html">List Property</a></li>
     </ul>
 </nav>
 
 <section class="property-details">
-    <div id="propertyContainer"><p style="text-align:center;">Loading property...</p></div>
+    <div id="propertyContainer"><p style="text-align:center; padding:40px;">Loading property...</p></div>
 </section>
 
 <footer><p>&copy; 2026 RentEasy Kenya. All Rights Reserved.</p></footer>
@@ -32,11 +31,9 @@ const container = document.getElementById("propertyContainer");
 async function loadProperty() {
   const params = new URLSearchParams(window.location.search);
   const idFromUrl = params.get('id');
-  
-  let property = null;
   let propertyId = idFromUrl;
+  let property = null;
 
-  // Try localStorage as backup
   const localData = localStorage.getItem("selectedProperty");
   if (localData) {
     try {
@@ -46,46 +43,41 @@ async function loadProperty() {
     } catch(e) {}
   }
 
-  // Fetch fresh from Firebase if we have ID
   if (propertyId) {
     try {
       const snap = await getDoc(doc(db, "properties", propertyId));
-      if (snap.exists()) {
-        property = { id: snap.id, ...snap.data() };
-      }
-    } catch(err) {
-      console.error(err);
-    }
+      if (snap.exists()) property = { id: snap.id, ...snap.data() };
+    } catch(err) { console.error(err); }
   }
 
   if (!property) {
-    container.innerHTML = `<div style="text-align:center; padding:20px;"><h2>Property not found</h2><p>Please go back to homepage and click View Details again.</p><a href="index.html">← Back</a></div>`;
+    container.innerHTML = `<div style="text-align:center; padding:20px;"><h2>Property not found</h2><p>Go back to homepage and click View Details again.</p><a href="index.html">← Back</a></div>`;
     return;
   }
 
-  // Handles both 'rooms' and 'bedrooms' etc.
-  const title = property.title || "Rental Property";
-  const location = property.location || property.area || "Location unavailable";
-  const rooms = property.rooms || property.bedrooms || "N/A";
-  const price = property.price || "Price not available";
-  const description = property.description || "No description available.";
-  const image = property.image || "https://picsum.photos/800/500";
+  // TRIM FIX
+  const title = (property.title || "").toString().trim() || "Rental Property";
+  const location = (property.location || "").toString().trim() || "Location unavailable";
+  const rooms = (property.rooms || "").toString().trim() || "N/A";
+  const price = (property.price || "").toString().trim() || "Price not available";
+  const description = (property.description || "").toString().trim() || "No description available.";
+  const image = (property.image || "").toString().trim() || "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80";
 
   container.innerHTML = `
     <div class="property-card">
-      <img src="${image}" alt="${title}" class="property-image" style="width:100%; max-height:400px; object-fit:cover;" onerror="this.src='https://picsum.photos/800/500'">
-      <div class="property-content" style="padding:15px;">
+      <img src="${image}" alt="${title}" style="width:100%; max-height:400px; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80'">
+      <div style="padding:15px;">
         <h1>${title}</h1>
         <p>📍 ${location}</p>
         <p>🛏️ ${rooms} Bedrooms</p>
-        <p style="color:blue; font-weight:bold;">KSh ${price}/month</p>
-        <h3>Property Description</h3><p>${description}</p>
+        <p style="color:#198754; font-weight:bold; font-size:18px;">KSh ${price}/month</p>
+        <h3>Description</h3><p>${description}</p>
         <h3>Location</h3>
         <iframe src="https://www.google.com/maps?q=${encodeURIComponent(location)}&output=embed" width="100%" height="300" style="border:0;" loading="lazy"></iframe>
         <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap;">
-          <button id="whatsappButton" style="background:#25D366; color:white; padding:10px 15px; border:none; border-radius:5px;">Contact on WhatsApp</button>
-          <button id="directionsButton" style="background:#007bff; color:white; padding:10px 15px; border:none; border-radius:5px;">📍 Get Directions</button>
-          <a href="index.html" style="background:#198754; color:white; padding:10px 15px; border-radius:5px; text-decoration:none;">← Back to Properties</a>
+          <button id="whatsappButton" style="background:#25D366; color:white; padding:10px 15px; border:none; border-radius:6px;">Contact on WhatsApp</button>
+          <button id="directionsButton" style="background:#007bff; color:white; padding:10px 15px; border:none; border-radius:6px;">📍 Get Directions</button>
+          <a href="index.html" style="background:#6c757d; color:white; padding:10px 15px; border-radius:6px; text-decoration:none;">← Back</a>
         </div>
       </div>
     </div>

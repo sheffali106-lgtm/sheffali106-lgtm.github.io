@@ -36,6 +36,7 @@ async function loadProperties() {
       const price = (property.price || "").toString().trim() || "Price not available";
       const description = (property.description || "").toString().trim() || "No description available.";
       const image = (property.image || "").toString().trim() || "https://picsum.photos/800/500";
+      const type = (property.type || "").toString().trim() || "Property";
 
       const card = document.createElement("div");
       card.className = "card";
@@ -44,6 +45,7 @@ async function loadProperties() {
         <img src="${image}" alt="${title}" onerror="this.src='https://picsum.photos/800/500'">
         <div class="card-content">
           <h3>${title}</h3>
+          <p>🏢 ${type}</p>
           <p>📍 ${location}</p>
           <p>🛏️ ${rooms} Bedrooms</p>
           <p class="price">KSh ${price}/month</p>
@@ -88,34 +90,75 @@ async function loadProperties() {
 
 loadProperties();
 
-// SEARCH PROPERTIES (unchanged)
+// ===============================
+// SEARCH PROPERTIES
+// ===============================
 window.searchProperties = function () {
-  const locationInput = document.getElementById("searchLocation");
-  const roomsInput = document.getElementById("searchRooms");
-  const priceInput = document.getElementById("searchPrice");
-  const location = locationInput?.value.trim().toLowerCase() || "";
-  const rooms = roomsInput?.value || "";
-  const maxPrice = priceInput?.value || "";
+
+  const location =
+    document.getElementById("searchLocation")?.value.trim().toLowerCase() || "";
+
+  const type =
+    document.getElementById("searchType")?.value.trim().toLowerCase() || "";
+
+  const bedrooms =
+    document.getElementById("searchBedrooms")?.value || "";
+
+  const maxPrice =
+    document.getElementById("searchPrice")?.value || "";
+
   const cards = document.querySelectorAll(".card");
 
   cards.forEach((card) => {
+
     const text = card.innerText.toLowerCase();
-    const matchesLocation = location === "" || text.includes(location);
-    let matchesRooms = true;
-    if (rooms !== "") {
-      matchesRooms = text.includes(rooms + " bedrooms") || text.includes(rooms + " bedroom");
+
+    const matchesLocation =
+      location === "" || text.includes(location);
+
+    const matchesType =
+      type === "" || text.includes(type);
+
+    let matchesBedrooms = true;
+
+    if (bedrooms !== "") {
+      matchesBedrooms =
+        text.includes(`${bedrooms} bedroom`) ||
+        text.includes(`${bedrooms} bedrooms`);
     }
+
     let matchesPrice = true;
+
     if (maxPrice !== "") {
       const priceElement = card.querySelector(".price");
+
       if (priceElement) {
         const priceText = priceElement.innerText.replace(/[^0-9]/g, "");
         const price = parseInt(priceText, 10);
+
         if (!isNaN(price)) {
           matchesPrice = price <= parseInt(maxPrice, 10);
         }
       }
     }
-    card.style.display = (matchesLocation && matchesRooms && matchesPrice) ? "" : "none";
+
+    card.style.display =
+      (matchesLocation &&
+       matchesType &&
+       matchesBedrooms &&
+       matchesPrice)
+        ? ""
+        : "none";
+
   });
+
 };
+
+// ===============================
+// SEARCH BUTTON
+// ===============================
+const searchBtn = document.getElementById("searchBtn");
+
+if (searchBtn) {
+  searchBtn.addEventListener("click", window.searchProperties);
+}

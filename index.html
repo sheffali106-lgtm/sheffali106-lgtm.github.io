@@ -9,11 +9,13 @@
 <body>
 
 <nav class="navbar">
-    <div class="logo">🏠 RentEasy Kenya</div>
+    <div class="logo">
+        🏠 RentEasy Kenya
+    </div>
     <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="#properties">Properties</a></li>
-        <li><a href="#" id="navListProperty">List Property</a></li>
+        <li><a href="landlord-login.html">List Property</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="contact.html">Contact</a></li>
     </ul>
@@ -21,13 +23,20 @@
 
 <header class="hero">
     <h1>Find Your Dream Home in Kenya</h1>
-    <p>Browse verified apartments, bedsitters, studios, maisonettes and houses across Kenya.</p>
+    <p>
+        Browse verified apartments, bedsitters, studios,
+        maisonettes and houses across Kenya.
+    </p>
 </header>
 
+<!-- SEARCH SECTION -->
 <section class="search-section">
     <h2>Search Properties</h2>
     <div class="search-box">
-        <input type="text" id="searchLocation" placeholder="📍 Search location">
+        <input
+            type="text"
+            id="searchLocation"
+            placeholder="📍 Search location">
         <select id="searchType">
             <option value="">All Property Types</option>
             <option>Apartment</option>
@@ -45,14 +54,21 @@
             <option value="4">4 Bedrooms</option>
             <option value="5">5+ Bedrooms</option>
         </select>
-        <input type="number" id="searchPrice" placeholder="💰 Maximum Rent">
-        <button id="searchBtn" class="btn">🔍 Search</button>
+        <input
+            type="number"
+            id="searchPrice"
+            placeholder="💰 Maximum Rent">
+        <button id="searchBtn" class="btn">
+            🔍 Search
+        </button>
     </div>
 </section>
 
 <section class="featured" id="properties">
     <h2>Featured Properties</h2>
-    <div id="dynamicProperties" class="properties"></div>
+    <div id="dynamicProperties" class="properties">
+        <!-- Firebase properties will appear here -->
+    </div>
 </section>
 
 <section class="why-us">
@@ -75,8 +91,12 @@
 
 <section class="cta">
     <h2>Are You a Landlord?</h2>
-    <p>List your rental property and connect with thousands of potential tenants across Kenya.</p>
-    <button id="ctaListProperty" class="btn">List Your Property</button>
+    <p>
+        List your rental property and connect with thousands of potential tenants across Kenya.
+    </p>
+    <a href="landlord-login.html" class="btn">
+        List Your Property
+    </a>
 </section>
 
 <footer>
@@ -84,28 +104,6 @@
 </footer>
 
 <script type="module" src="script.js"></script>
-
-<!-- LOGIN CHECK FOR LIST PROPERTY -->
-<script type="module">
-import { auth } from "./firebase.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-
-function handleListPropertyClick(e){
-    e.preventDefault();
-    // Quick check - wait for auth
-    const unsubscribe = onAuthStateChanged(auth, (user)=>{
-        unsubscribe();
-        if(user){
-            window.location.href = "list-property.html";
-        } else {
-            window.location.href = "landlord-login.html";
-        }
-    });
-}
-
-document.getElementById('navListProperty').addEventListener('click', handleListPropertyClick);
-document.getElementById('ctaListProperty').addEventListener('click', handleListPropertyClick);
-</script>
 
 </body>
 </html>

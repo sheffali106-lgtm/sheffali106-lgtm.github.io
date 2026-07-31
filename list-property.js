@@ -1,21 +1,22 @@
 import { app, db } from "./firebase.js";
 
 import {
-  getAuth,
-  onAuthStateChanged
+    getAuth,
+    onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
 import {
-  collection,
-  addDoc,
-  serverTimestamp
+    collection,
+    addDoc,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const auth = getAuth(app);
 
 const form = document.getElementById("propertyForm");
 const messageDiv = document.getElementById("formMessage");
-const section = document.querySelector("section");
+const section = document.getElementById("propertySection");
+const loadingMessage = document.getElementById("loadingMessage");
 
 section.style.display = "none";
 
@@ -30,6 +31,7 @@ onAuthStateChanged(auth, (user) => {
 
     currentUser = user;
 
+    loadingMessage.style.display = "none";
     section.style.display = "block";
 
 });

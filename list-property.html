@@ -57,13 +57,9 @@
         <input
             type="text"
             id="image"
-            placeholder="Image URLs separated by commas
-Example:
-https://image1.jpg, https://image2.jpg, https://image3.jpg">
+            placeholder="Image URLs separated by commas">
 
-        <button type="submit"
-            class="btn"
-            style="background:#25D366;color:white;padding:12px;border:none;border-radius:6px;cursor:pointer;">
+        <button type="submit" class="btn">
             List Property
         </button>
 
@@ -77,12 +73,23 @@ https://image1.jpg, https://image2.jpg, https://image3.jpg">
 </footer>
 
 <script type="module">
-import { db } from "./firebase.js";
+import { app, db } from "./firebase.js";
+
+import {
+    getAuth
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
 import {
     collection,
     addDoc,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+const auth = getAuth(app);
+
+if (!auth.currentUser) {
+    window.location.href = "login.html";
+}
 
 const form = document.getElementById("propertyForm");
 const messageDiv = document.getElementById("formMessage");
@@ -94,76 +101,65 @@ form.addEventListener("submit", async (e) => {
     const location = document.getElementById("location").value.trim();
     const bedroomsValue = document.getElementById("bedrooms").value.trim();
     const priceValue = document.getElementById("price").value.trim();
-
     const type = document.getElementById("type").value;
     const phone = document.getElementById("phone").value.trim();
     const amenities = document.getElementById("amenities").value.trim();
     const featured = document.getElementById("featured").checked;
-
     const description = document.getElementById("description").value.trim();
 
     const imageInput = document.getElementById("image").value.trim();
 
     const images = imageInput
-        ? imageInput
-            .split(",")
-            .map(url => url.trim())
-            .filter(url => url !== "")
+        ? imageInput.split(",").map(url => url.trim()).filter(url => url !== "")
         : ["https://picsum.photos/800/500"];
 
     const image = images[0];
 
-    if (!title || !location || !bedroomsValue || !priceValue || !type || !phone || !description) {
-        messageDiv.innerHTML = `<p style="color:red;">Please fill all required fields</p>`;
-        return;
-    }
-
-    const rooms = parseInt(bedroomsValue, 10);
-    const price = parseInt(priceValue, 10);
-
-    const btn = form.querySelector('button[type="submit"]');
-    btn.disabled = true;
-    btn.innerText = "Listing...";
-
     try {
 
         await addDoc(collection(db, "properties"), {
-            title: title,
-            location: location,
 
-            rooms: rooms,
-            bedrooms: rooms,
+            ownerId: auth.currentUser.uid,
+            ownerEmail: auth.currentUser.email,
 
-            price: price,
-            rent: price,
+            title,
+            location,
 
-            type: type,
-            phone: phone,
-            amenities: amenities,
+            rooms: parseInt(bedroomsValue),
+            bedrooms: parseInt(bedroomsValue),
 
-            featured: featured,
+            price: parseInt(priceValue),
+            rent: parseInt(priceValue),
 
-            description: description,            image: image,
+            type,
+            phone,
+            amenities,
+            featured,
+
+            description,
+
+            image,
             imageUrl: image,
-            images: images,
+            images,
 
             createdAt: serverTimestamp()
+
         });
 
-        messageDiv.innerHTML = `<p style="color:green;">✅ Property listed successfully!</p>`;
+        messageDiv.innerHTML = "<p style='color:green;'>✅ Property listed successfully!</p>";
 
         form.reset();
 
         setTimeout(() => {
-            window.location.href = "index.html";
+            window.location.href = "dashboard.html";
         }, 1500);
 
     } catch (error) {
-        console.error(error);
-        messageDiv.innerHTML = `<p style="color:red;">Failed: ${error.message}</p>`;
-        btn.disabled = false;
-        btn.innerText = "List Property";
+
+        messageDiv.innerHTML = `<p style="color:red;">${error.message}</p>`;
+
     }
+
 });
 </script>
 

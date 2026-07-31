@@ -17,14 +17,13 @@
         <div id="authMessage"></div>
     </form>
     <p style="margin-top:15px; text-align:center;"><a href="#" id="toggleAuth">Don't have account? Register</a></p>
-    <button id="logoutBtn" style="display:none; margin-top:15px; width:100%; padding:10px; background:#dc3545; color:white; border:none; border-radius:5px;">Logout</button>
+    <button id="logoutBtn" style="display:none; margin-top:15px; width:100%; padding:10px; background:#dc3545; color:white; border:none; border-radius:5px; cursor:pointer;">Logout</button>
 </section>
 <script type="module">
 import { auth } from "./firebase.js";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 const form = document.getElementById('authForm'), msg = document.getElementById('authMessage'), toggle = document.getElementById('toggleAuth'), title = document.getElementById('authTitle'), btn = document.getElementById('authBtn'), logoutBtn = document.getElementById('logoutBtn'), loggedInfo = document.getElementById('loggedInfo');
 let isLogin = true;
-
 onAuthStateChanged(auth, (user) => {
     if (user) {
         loggedInfo.style.display="block";
@@ -40,23 +39,17 @@ onAuthStateChanged(auth, (user) => {
         toggle.style.display="block";
     }
 });
-
-toggle.addEventListener('click', (e) => { e.preventDefault(); isLogin =!isLogin; title.textContent = isLogin? "Landlord Login" : "Landlord Register"; btn.textContent = isLogin? "Login" : "Register"; toggle.textContent = isLogin? "Don't have account? Register" : "Already have account? Login"; });
-
+toggle.addEventListener('click', (e) => { e.preventDefault(); isLogin=!isLogin; title.textContent = isLogin? "Landlord Login" : "Landlord Register"; btn.textContent = isLogin? "Login" : "Register"; toggle.textContent = isLogin? "Don't have account? Register" : "Already have account? Login"; });
 form.addEventListener('submit', async (e) => {
     e.preventDefault(); msg.textContent = "Please wait...";
     const email = document.getElementById('email').value, pass = document.getElementById('password').value;
     try { 
-        if (isLogin) { await signInWithEmailAndPassword(auth, email, pass); } 
-        else { await createUserWithEmailAndPassword(auth, email, pass); } 
+        if (isLogin) await signInWithEmailAndPassword(auth, email, pass); 
+        else await createUserWithEmailAndPassword(auth, email, pass); 
         window.location.href = "list-property.html"; 
     } catch (err) { msg.innerHTML = `<p style="color:red;">${err.message}</p>`; }
 });
-
-logoutBtn.addEventListener('click', async()=>{
-    await signOut(auth);
-    msg.innerHTML = `<p style="color:green;">Logged out. Now you can test login.</p>`;
-});
+logoutBtn.addEventListener('click', async()=>{ await signOut(auth); msg.innerHTML = `<p style="color:green;">Logged out. Now test login.</p>`; });
 </script>
 </body>
 </html>

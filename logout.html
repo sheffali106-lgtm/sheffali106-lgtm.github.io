@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head><title>Logging out...</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="style.css"></head>
+<body style="font-family:sans-serif; text-align:center; margin-top:100px;">
+<h3>Logging you out...</h3>
+<p>Please wait</p>
+<script type="module">
+import { auth } from "./firebase.js";
+import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+onAuthStateChanged(auth, async (user)=>{
+    if(user){
+        await signOut(auth);
+        document.body.innerHTML = "<h3 style='color:green;'>✅ Logged out! Redirecting...</h3>";
+        setTimeout(()=> window.location.href = "landlord-login.html", 1000);
+    } else {
+        document.body.innerHTML = "<h3>You were not logged in. Redirecting to login...</h3>";
+        setTimeout(()=> window.location.href = "landlord-login.html", 1000);
+    }
+});
+</script>
+</body>
+</html>

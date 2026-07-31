@@ -13,6 +13,7 @@
     <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="list-property.html">List Property</a></li>
+        <li><a href="#" id="logoutBtn" style="display:none;">Logout</a></li>
     </ul>
 </nav>
 
@@ -21,322 +22,135 @@
 </section>
 
 <script type="module">
-import { db } from "./firebase.js";
-import {
-    doc,
-    getDoc,
-    collection,
-    getDocs,
-    addDoc,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { db, auth } from "./firebase.js";
+import { doc, getDoc, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 const container = document.getElementById("propertyDetails");
 
+// Logout button logic
+onAuthStateChanged(auth, (user) => {
+    const btn = document.getElementById('logoutBtn');
+    if (user) { btn.style.display = 'block'; } else { btn.style.display = 'none'; }
+});
+document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
+    e.preventDefault(); await signOut(auth); window.location.href = "index.html";
+});
+
 if (!id) {
-    container.innerHTML = "<p>No property ID found. Go back to <a href='index.html'>Home</a> and click View Details.</p>";
+    container.innerHTML = "<p>No property ID. Go <a href='index.html'>Home</a>.</p>";
 } else {
     try {
         const snap = await getDoc(doc(db, "properties", id));
-
         if (!snap.exists()) {
             container.innerHTML = "<p>Property not found.</p>";
         } else {
-
             const p = snap.data();
-
-            const location = p.location || p.area || p.town || "Location unavailable";
-            const rooms = p.rooms || p.bedrooms || p.beds || "N/A";
-            const price = p.price || p.rent || "Price not available";
+            const location = p.location || p.area || "Location unavailable";
+            const rooms = p.rooms || p.bedrooms || "N/A";
+            const price = p.price || p.rent || 0;
+            const formattedPrice = typeof price === 'number' ? price.toLocaleString() : price;
             const title = p.title || "Rental Property";
-            const description = p.description || p.desc || "No description available.";
-
+            const description = p.description || "No description.";
             const type = p.type || "Not specified";
             const phone = p.phone || "";
             const amenities = p.amenities || "Not specified";
-
-            // Support both old and new listings
-            const images = Array.isArray(p.images) && p.images.length > 0
-                ? p.images
-                : [p.image || p.imageUrl || p.photo || "https://picsum.photos/800/500"];
-
+            const images = Array.isArray(p.images) && p.images.length > 0 ? p.images : [p.image || p.imageUrl || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800"];
             let currentImage = 0;
 
-            let whatsappNumber = "";
-            if (phone) {
-                whatsappNumber = phone.startsWith("0")
-                    ? "254" + phone.substring(1)
-                    : phone;
-            }
+            // Clean phone for wa.me
+            let whatsappNumber = phone.replace(/\s+/g, '').replace(/\+/g, '');
+            if (whatsappNumber.startsWith('0')) whatsappNumber = '254' + whatsappNumber.substring(1);
+            const waMessage = encodeURIComponent(`Hi! I'm interested in your property *${title}* in ${location} - KSh ${formattedPrice}/month listed on RentEasy Kenya. Is it still available?`);
+            const waLink = `https://wa.me/${whatsappNumber}?text=${waMessage}`;
 
             container.innerHTML = `
-                <img id="galleryImage"
-                     src="${images[0]}"
-                     style="width:100%;border-radius:10px;max-height:500px;object-fit:cover;">
-
+                <img id="galleryImage" src="${images[0]}" style="width:100%;border-radius:10px;max-height:500px;object-fit:cover;">
                 <div style="display:flex;justify-content:space-between;margin-top:15px;">
-                    <button id="prevImage">◀ Previous</button>
-                    <button id="nextImage">Next ▶</button>
+                    <button id="prevImage" class="btn" style="background:#ddd;color:#333;">◀ Previous</button>
+                    <button id="nextImage" class="btn" style="background:#ddd;color:#333;">Next ▶</button>
                 </div>
-
                 <h2 style="margin-top:20px;">${title}</h2>
-
-                <p>🏢 <strong>Property Type:</strong> ${type}</p>
-
+                <p>🏢 <strong>Type:</strong> ${type}</p>
                 <p>📍 <strong>Location:</strong> ${location}</p>
-
                 <p>🛏️ <strong>Bedrooms:</strong> ${rooms}</p>
-
-                <p>💰 <strong>Rent:</strong> KSh ${price}/month</p>
-
+                <p>💰 <strong>Rent:</strong> KSh ${formattedPrice}/month</p>
                 <p>📞 <strong>Contact:</strong> ${phone || "Not provided"}</p>
-
                 <p>✅ <strong>Amenities:</strong> ${amenities}</p>
+                <p style="margin-top:20px;"><strong>Description</strong><br>${description}</p>
 
-                <p style="margin-top:20px;">
-                    <strong>Description</strong><br>
-                    ${description}
-                </p>
-
-                <div style="display:flex;gap:15px;flex-wrap:wrap;margin-top:30px;">                    ${
-                        phone
-                        ? `<a href="tel:${phone}"
-                             style="background:#0d6efd; color:white; padding:12px 20px; border-radius:6px; text-decoration:none;">
-                             📞 Call Landlord
-                           </a>`
-                        : ""
-                    }
-
-                    ${
-                        whatsappNumber
-                        ? `<a href="https://wa.me/${whatsappNumber}"
-                             target="_blank"
-                             style="background:#25D366; color:white; padding:12px 20px; border-radius:6px; text-decoration:none;">
-                             💬 WhatsApp
-                           </a>`
-                        : ""
-                    }
-
-                    <a href="https://www.google.com/maps/search/${encodeURIComponent(location)}"
-                       target="_blank"
-                       style="background:#EA4335; color:white; padding:12px 20px; border-radius:6px; text-decoration:none;">
-                        📍 View on Google Maps
-                    </a>
-
+                <div style="display:flex;gap:15px;flex-wrap:wrap;margin-top:30px;">
+                    ${phone ? `<a href="tel:${phone}" style="background:#0d6efd; color:white; padding:12px 20px; border-radius:6px; text-decoration:none;">📞 Call Landlord</a>` : ""}
+                    ${phone ? `<a href="${waLink}" target="_blank" style="background:#25D366; color:white; padding:12px 20px; border-radius:6px; text-decoration:none; font-weight:bold;">💬 WhatsApp Landlord</a>` : ""}
+                    <a href="https://www.google.com/maps/search/${encodeURIComponent(location)}" target="_blank" style="background:#EA4335; color:white; padding:12px 20px; border-radius:6px; text-decoration:none;">📍 View on Maps</a>
                 </div>
 
-                <br><br>
-<hr style="margin:40px 0;">
-
-<h2>📅 Book a Viewing</h2>
-
-<form id="bookingForm" style="display:flex;flex-direction:column;gap:15px;max-width:500px;">
-
-    <input
-        type="text"
-        id="viewerName"
-        placeholder="Your Full Name"
-        required>
-
-    <input
-        type="tel"
-        id="viewerPhone"
-        placeholder="Your Phone Number"
-        required>
-
-    <input
-        type="date"
-        id="viewingDate"
-        required>
-
-    <input
-        type="time"
-        id="viewingTime"
-        required>
-
-    <textarea
-        id="viewerMessage"
-        rows="4"
-        placeholder="Optional message to the landlord"></textarea>
-
-    <button
-        type="submit"
-        style="background:#25D366;color:white;border:none;padding:12px;border-radius:6px;cursor:pointer;">
-        Book Viewing
-    </button>
-
-</form>
-
-<div id="bookingMessage" style="margin-top:15px;"></div>
-
-                <a href="index.html" style="color:#25D366;">← Back to listings</a>
-
-<hr style="margin:40px 0;">
-
-<h2>🏠 Similar Properties</h2>
-
-<div id="similarProperties">
-    <p>Loading similar properties...</p>
-</div>
+                <br><br><hr style="margin:40px 0;">
+                <h2>📅 Book a Viewing</h2>
+                <form id="bookingForm" style="display:flex;flex-direction:column;gap:15px;max-width:500px;">
+                    <input type="text" id="viewerName" placeholder="Your Full Name" required>
+                    <input type="tel" id="viewerPhone" placeholder="Your Phone Number" required>
+                    <input type="date" id="viewingDate" required>
+                    <input type="time" id="viewingTime" required>
+                    <textarea id="viewerMessage" rows="4" placeholder="Optional message"></textarea>
+                    <button type="submit" style="background:#25D366;color:white;border:none;padding:12px;border-radius:6px;cursor:pointer;">Book Viewing</button>
+                </form>
+                <div id="bookingMessage" style="margin-top:15px;"></div>
+                <br><a href="index.html" style="color:#25D366;">← Back to listings</a>
+                <hr style="margin:40px 0;">
+                <h2>🏠 Similar Properties</h2>
+                <div id="similarProperties"><p>Loading...</p></div>
             `;
 
-            // ===============================
-            // IMAGE GALLERY
-            // ===============================
             const galleryImage = document.getElementById("galleryImage");
             const prevImage = document.getElementById("prevImage");
             const nextImage = document.getElementById("nextImage");
-
-            if (images.length <= 1) {
-                prevImage.style.display = "none";
-                nextImage.style.display = "none";
-            } else {
-
-                prevImage.addEventListener("click", () => {
-                    currentImage =
-                        (currentImage - 1 + images.length) % images.length;
-
-                    galleryImage.src = images[currentImage];
-                });
-
-                nextImage.addEventListener("click", () => {
-                    currentImage =
-                        (currentImage + 1) % images.length;
-
-                    galleryImage.src = images[currentImage];
-                });
-
+            if (images.length <= 1) { prevImage.style.display = "none"; nextImage.style.display = "none"; } 
+            else {
+                prevImage.addEventListener("click", () => { currentImage = (currentImage - 1 + images.length) % images.length; galleryImage.src = images[currentImage]; });
+                nextImage.addEventListener("click", () => { currentImage = (currentImage + 1) % images.length; galleryImage.src = images[currentImage]; });
             }
 
-                    // ===============================
-            // LOAD SIMILAR PROPERTIES
-            // ===============================
             const similarContainer = document.getElementById("similarProperties");
-
-            if (similarContainer) {
-
-                const snapshot = await getDocs(collection(db, "properties"));
-
-                let html = "";
-                let count = 0;
-
-                snapshot.forEach((docSnap) => {
-
-                    if (docSnap.id === id) return;
-
-                    const item = docSnap.data();
-
-                    const sameLocation =
-                        (item.location || "").toLowerCase() === location.toLowerCase();
-
-                    const sameType =
-                        (item.type || "").toLowerCase() === type.toLowerCase();
-
-                    if ((sameLocation || sameType) && count < 3) {
-
-                        const image =
-                            item.image ||
-                            item.imageUrl ||
-                            "https://picsum.photos/400/250";
-
-                        html += `
-                            <div style="border:1px solid #ddd;padding:15px;margin-bottom:15px;border-radius:10px;">
-                                <img src="${image}"
-                                     style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;">
-
-                                <h3>${item.title}</h3>
-
-                                <p>📍 ${item.location}</p>
-
-                                <p><strong>KSh ${item.price}/month</strong></p>
-
-                                <a href="property.html?id=${docSnap.id}"
-                                   style="display:inline-block;margin-top:10px;background:#25D366;color:white;padding:10px 18px;border-radius:6px;text-decoration:none;">
-                                   View Details
-                                </a>
-                            </div>
-                        `;
-
-                        count++;
-                    }
-
-                });
-
-                if (count === 0) {
-                    html = "<p>No similar properties found.</p>";
+            const snapshot = await getDocs(collection(db, "properties"));
+            let html = ""; let count = 0;
+            snapshot.forEach((docSnap) => {
+                if (docSnap.id === id) return;
+                const item = docSnap.data();
+                const sameLocation = (item.location || "").toLowerCase() === location.toLowerCase();
+                const sameType = (item.type || "").toLowerCase() === type.toLowerCase();
+                if ((sameLocation || sameType) && count < 3) {
+                    const img = item.image || item.imageUrl || "https://picsum.photos/400/250";
+                    html += `<div style="border:1px solid #ddd;padding:15px;margin-bottom:15px;border-radius:10px;"><img src="${img}" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;"><h3>${item.title}</h3><p>📍 ${item.location}</p><p><strong>KSh ${item.price}/month</strong></p><a href="property.html?id=${docSnap.id}" style="display:inline-block;margin-top:10px;background:#25D366;color:white;padding:10px 18px;border-radius:6px;text-decoration:none;">View Details</a></div>`;
+                    count++;
                 }
-
-                                similarContainer.innerHTML = html;
-// ===============================
-// BOOK A VIEWING
-// ===============================
-const bookingForm = document.getElementById("bookingForm");
-
-if (bookingForm) {
-
-    bookingForm.addEventListener("submit", async (e) => {
-
-        e.preventDefault();
-
-        const name = document.getElementById("viewerName").value.trim();
-        const phoneNumber = document.getElementById("viewerPhone").value.trim();
-        const date = document.getElementById("viewingDate").value;
-        const time = document.getElementById("viewingTime").value;
-        const message = document.getElementById("viewerMessage").value.trim();
-
-        const bookingMessage = document.getElementById("bookingMessage");
-
-        try {
-
-            await addDoc(collection(db, "bookings"), {
-
-                propertyId: id,
-                propertyTitle: title,
-                propertyLocation: location,
-
-                landlordPhone: phone,
-
-                visitorName: name,
-                visitorPhone: phoneNumber,
-
-                viewingDate: date,
-                viewingTime: time,
-
-                message: message,
-
-                createdAt: serverTimestamp()
-
             });
+            similarContainer.innerHTML = html || "<p>No similar properties found.</p>";
 
-            bookingMessage.innerHTML =
-                `<p style="color:green;">✅ Viewing request sent successfully!</p>`;
-
-            bookingForm.reset();
-
-        } catch (error) {
-
-            console.error(error);
-
-            bookingMessage.innerHTML =
-                `<p style="color:red;">Failed to send booking request.</p>`;
-
+            const bookingForm = document.getElementById("bookingForm");
+            bookingForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                try {
+                    await addDoc(collection(db, "bookings"), {
+                        propertyId: id, propertyTitle: title, propertyLocation: location, landlordPhone: phone,
+                        visitorName: document.getElementById("viewerName").value.trim(),
+                        visitorPhone: document.getElementById("viewerPhone").value.trim(),
+                        viewingDate: document.getElementById("viewingDate").value,
+                        viewingTime: document.getElementById("viewingTime").value,
+                        message: document.getElementById("viewerMessage").value.trim(),
+                        createdAt: serverTimestamp()
+                    });
+                    document.getElementById("bookingMessage").innerHTML = `<p style="color:green;">✅ Viewing request sent! The landlord will contact you on WhatsApp.</p>`;
+                    bookingForm.reset();
+                } catch (error) { document.getElementById("bookingMessage").innerHTML = `<p style="color:red;">Failed to send booking.</p>`; }
+            });
         }
-
-    });
-
-}
-            }
-
-        }
-
     } catch (err) {
-        console.error(err);
         container.innerHTML = `<p>Error loading: ${err.message}</p>`;
     }
 }
 </script>
-
 </body>
 </html>

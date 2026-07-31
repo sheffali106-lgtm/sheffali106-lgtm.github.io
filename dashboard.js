@@ -1,4 +1,9 @@
-import { db } from "./firebase.js";
+import { app, db } from "./firebase.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
 import {
   collection,
@@ -7,7 +12,19 @@ import {
   doc
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
+const auth = getAuth(app);
 const dashboard = document.getElementById("dashboardProperties");
+
+onAuthStateChanged(auth, (user) => {
+
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  loadProperties();
+
+});
 
 async function loadProperties() {
 
@@ -31,46 +48,41 @@ async function loadProperties() {
       dashboard.innerHTML += `
         <div class="card">
 
-            <img src="${data.image}" alt="${data.title}">
+          <img src="${data.image}" alt="${data.title}">
 
-            <h3>${data.title}</h3>
+          <h3>${data.title}</h3>
 
-            <p><strong>Location:</strong> ${data.location}</p>
+          <p><strong>Location:</strong> ${data.location}</p>
 
-            <p><strong>Rooms:</strong> ${data.rooms}</p>
+          <p><strong>Price:</strong> KSh ${data.price}</p>
 
-            <p><strong>Price:</strong> KSh ${data.price}/month</p>
+          <button class="btn">Edit</button>
 
-            <button class="btn edit-btn">
-                Edit
-            </button>
-
-            <button class="btn delete-btn"
-                onclick="deleteProperty('${property.id}')">
-                Delete
-            </button>
+          <button class="btn delete-btn"
+            onclick="deleteProperty('${property.id}')">
+            Delete
+          </button>
 
         </div>
       `;
+
     });
 
   } catch (error) {
-    console.error(error);
+
     dashboard.innerHTML = "<p>Error loading properties.</p>";
+    console.error(error);
+
   }
+
 }
 
-window.deleteProperty = async function (id) {
+window.deleteProperty = async function(id) {
 
-  const confirmed = confirm("Delete this property?");
-
-  if (!confirmed) return;
+  if (!confirm("Delete this property?")) return;
 
   await deleteDoc(doc(db, "properties", id));
 
-  alert("Property deleted successfully.");
-
   loadProperties();
-};
 
-loadProperties();
+};

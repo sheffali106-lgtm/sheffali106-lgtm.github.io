@@ -9,20 +9,20 @@
 <body>
 <nav class="navbar">
     <div class="logo">🏠 RentEasy Kenya</div>
-    <ul class="nav-links" id="navLinks">
+    <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="#properties">Properties</a></li>
         <li><a href="landlord-login.html">List Property</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="contact.html">Contact</a></li>
-        <li id="navLogout" style="display:none;"><a href="logout.html" style="background:#dc3545; color:white; padding:6px 12px; border-radius:5px;">Logout</a></li>
-        <li id="navLogin"><a href="landlord-login.html">Login</a></li>
     </ul>
 </nav>
+
 <header class="hero">
     <h1>Find Your Dream Home in Kenya</h1>
     <p>Browse verified apartments, bedsitters, studios, maisonettes and houses across Kenya.</p>
 </header>
+
 <section class="search-section">
     <h2>Search Properties</h2>
     <div class="search-box">
@@ -33,10 +33,12 @@
         <button id="searchBtn" class="btn">🔍 Search</button>
     </div>
 </section>
+
 <section class="featured" id="properties">
     <h2>Featured Properties</h2>
     <div id="dynamicProperties" class="properties"></div>
 </section>
+
 <section class="why-us">
     <h2>Why Choose RentEasy Kenya?</h2>
     <div class="features">
@@ -45,26 +47,33 @@
         <div class="feature"><h3>📍 Prime Locations</h3><p>Find homes in Kileleshwa, Kilimani, Westlands, Runda, Ruaka and many more.</p></div>
     </div>
 </section>
+
 <section class="cta">
     <h2>Are You a Landlord?</h2>
     <p>List your rental property and connect with thousands of potential tenants across Kenya.</p>
     <a href="landlord-login.html" class="btn">List Your Property</a>
+    
+    <!-- LOGOUT BUTTON - GREEN - DOWN HERE -->
+    <div id="logoutSection" style="display:none; margin-top:20px;">
+        <p id="userEmail" style="margin-bottom:10px; color:#555;"></p>
+        <a href="logout.html" class="btn" style="background:#28a745;">Logout</a>
+    </div>
 </section>
+
 <footer><p>&copy; 2026 RentEasy Kenya. All Rights Reserved.</p></footer>
 
 <script type="module" src="script.js"></script>
 <script type="module">
 import { auth } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-const navLogout = document.getElementById('navLogout');
-const navLogin = document.getElementById('navLogin');
+const logoutSection = document.getElementById('logoutSection');
+const userEmail = document.getElementById('userEmail');
 onAuthStateChanged(auth, (user)=>{
     if(user){
-        navLogout.style.display="block";
-        navLogin.style.display="none";
+        logoutSection.style.display="block";
+        userEmail.textContent = "Logged in as: " + user.email;
     } else {
-        navLogout.style.display="none";
-        navLogin.style.display="block";
+        logoutSection.style.display="none";
     }
 });
 </script>

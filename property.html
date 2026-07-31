@@ -52,28 +52,58 @@
 const container =
     document.getElementById("propertyContainer");
 
+
+// Get the selected property saved by script.js
 const propertyData =
     localStorage.getItem("selectedProperty");
 
+
+console.log("Selected property:", propertyData);
+
+
+// ===============================
+// CHECK IF PROPERTY EXISTS
+// ===============================
 
 if (!propertyData) {
 
     container.innerHTML = `
 
-        <h2>Property not found</h2>
+        <div class="property-card">
 
-        <p>
-            Please go back to the properties page
-            and select a property again.
-        </p>
+            <div class="property-content">
 
-        <a href="index.html" class="btn">
-            Back to Properties
-        </a>
+                <h2>
+                    Property not found
+                </h2>
+
+                <p>
+                    Please return to the properties page
+                    and select a property again.
+                </p>
+
+                <a
+                    href="index.html"
+                    class="btn">
+
+                    ← Back to Properties
+
+                </a>
+
+            </div>
+
+        </div>
 
     `;
 
-} else {
+}
+
+
+// ===============================
+// LOAD PROPERTY
+// ===============================
+
+else {
 
     try {
 
@@ -81,38 +111,65 @@ if (!propertyData) {
             JSON.parse(propertyData);
 
 
+        console.log(
+            "Parsed property:",
+            property
+        );
+
+
+        // ===============================
+        // PROPERTY INFORMATION
+        // ===============================
+
         const title =
-            property.title || "Rental Property";
+            property.title ||
+            "Rental Property";
+
 
         const location =
-            property.location || "Location not available";
+            property.location ||
+            "Location not available";
+
 
         const rooms =
-            property.rooms || "N/A";
+            property.rooms ||
+            "N/A";
+
 
         const price =
-            property.price || "Price not available";
+            property.price ||
+            "Price not available";
+
 
         const description =
-            property.description || "No description available.";
+            property.description ||
+            "No description available.";
+
 
         const image =
             property.image ||
             "https://picsum.photos/800/500";
 
 
+        // ===============================
+        // DISPLAY PROPERTY
+        // ===============================
+
         container.innerHTML = `
 
             <div class="property-card">
+
 
                 <img
                     src="${image}"
                     alt="${title}"
                     class="property-image"
+                    onerror="this.src='https://picsum.photos/800/500'"
                 >
 
 
                 <div class="property-content">
+
 
                     <h1>
                         ${title}
@@ -154,11 +211,13 @@ if (!propertyData) {
                         width="100%"
                         height="300"
                         style="border:0;"
-                        loading="lazy">
+                        loading="lazy"
+                        allowfullscreen>
                     </iframe>
 
 
                     <div class="property-buttons">
+
 
                         <button
                             class="whatsapp-btn"
@@ -186,7 +245,9 @@ if (!propertyData) {
 
                         </a>
 
+
                     </div>
+
 
                 </div>
 
@@ -195,42 +256,75 @@ if (!propertyData) {
         `;
 
 
-        document
-            .getElementById("whatsappButton")
-            .addEventListener("click", function () {
+        // ===============================
+        // WHATSAPP
+        // ===============================
+
+        const whatsappButton =
+            document.getElementById(
+                "whatsappButton"
+            );
+
+
+        whatsappButton.addEventListener(
+            "click",
+            function () {
+
 
                 const message =
                     `Hello, I am interested in ${title} in ${location}.`;
 
+
                 const whatsappURL =
                     "https://wa.me/254799520544?text=" +
                     encodeURIComponent(message);
+
 
                 window.open(
                     whatsappURL,
                     "_blank"
                 );
 
-            });
+
+            }
+        );
 
 
-        document
-            .getElementById("directionsButton")
-            .addEventListener("click", function () {
+        // ===============================
+        // GOOGLE MAPS DIRECTIONS
+        // ===============================
+
+        const directionsButton =
+            document.getElementById(
+                "directionsButton"
+            );
+
+
+        directionsButton.addEventListener(
+            "click",
+            function () {
+
 
                 const mapsURL =
                     "https://www.google.com/maps/search/?api=1&query=" +
                     encodeURIComponent(location);
+
 
                 window.open(
                     mapsURL,
                     "_blank"
                 );
 
-            });
+
+            }
+        );
 
 
-    } catch (error) {
+    }
+
+
+    catch (error) {
+
 
         console.error(
             "Error loading property:",
@@ -240,23 +334,30 @@ if (!propertyData) {
 
         container.innerHTML = `
 
-            <h2>
-                Unable to load property
-            </h2>
+            <div class="property-card">
 
+                <div class="property-content">
 
-            <p>
-                There was a problem loading this property.
-            </p>
+                    <h2>
+                        Unable to load property
+                    </h2>
 
+                    <p>
+                        There was a problem loading
+                        this property.
+                    </p>
 
-            <a
-                href="index.html"
-                class="btn">
+                    <a
+                        href="index.html"
+                        class="btn">
 
-                Back to Properties
+                        ← Back to Properties
 
-            </a>
+                    </a>
+
+                </div>
+
+            </div>
 
         `;
 
@@ -266,5 +367,7 @@ if (!propertyData) {
 
 </script>
 
+
 </body>
+
 </html>

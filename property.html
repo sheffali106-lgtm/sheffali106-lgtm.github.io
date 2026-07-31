@@ -269,6 +269,64 @@ if (!id) {
                 }
 
                                 similarContainer.innerHTML = html;
+// ===============================
+// BOOK A VIEWING
+// ===============================
+const bookingForm = document.getElementById("bookingForm");
+
+if (bookingForm) {
+
+    bookingForm.addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        const name = document.getElementById("viewerName").value.trim();
+        const phoneNumber = document.getElementById("viewerPhone").value.trim();
+        const date = document.getElementById("viewingDate").value;
+        const time = document.getElementById("viewingTime").value;
+        const message = document.getElementById("viewerMessage").value.trim();
+
+        const bookingMessage = document.getElementById("bookingMessage");
+
+        try {
+
+            await addDoc(collection(db, "bookings"), {
+
+                propertyId: id,
+                propertyTitle: title,
+                propertyLocation: location,
+
+                landlordPhone: phone,
+
+                visitorName: name,
+                visitorPhone: phoneNumber,
+
+                viewingDate: date,
+                viewingTime: time,
+
+                message: message,
+
+                createdAt: serverTimestamp()
+
+            });
+
+            bookingMessage.innerHTML =
+                `<p style="color:green;">✅ Viewing request sent successfully!</p>`;
+
+            bookingForm.reset();
+
+        } catch (error) {
+
+            console.error(error);
+
+            bookingMessage.innerHTML =
+                `<p style="color:red;">Failed to send booking request.</p>`;
+
+        }
+
+    });
+
+}
             }
 
         }

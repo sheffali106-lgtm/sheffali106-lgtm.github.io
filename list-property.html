@@ -5,112 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>List Property | RentEasy Kenya</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .form-container { max-width:600px; margin:40px auto; padding:20px; background:white; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+        .form-container input, .form-container select, .form-container textarea { width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:6px; }
+        .form-container button { width:100%; padding:14px; background:#0d6efd; color:white; border:none; border-radius:6px; font-size:16px; cursor:pointer; }
+    </style>
 </head>
 <body>
 
 <nav class="navbar">
     <div class="logo">🏠 RentEasy Kenya</div>
-
     <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
-        <li><a href="index.html#properties">Properties</a></li>
-        <li><a href="list-property.html">List Property</a></li>
         <li><a href="dashboard.html">Dashboard</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="contact.html">Contact</a></li>
     </ul>
 </nav>
 
-<section id="propertySection" style="max-width:700px; margin:40px auto; padding:20px; display:none;">
+<div id="loadingMessage" style="text-align:center; margin-top:50px;">Checking login...</div>
 
-    <h2>List Your Property</h2>
+<section id="propertySection" style="display:none;">
+    <div class="form-container">
+        <h2>List Your Property</h2>
+        <form id="propertyForm">
+            <input type="text" id="title" placeholder="Property Title e.g. 2BR in Kileleshwa" required>
+            <input type="text" id="location" placeholder="Location e.g. Kileleshwa, Nairobi" required>
+            <input type="number" id="bedrooms" placeholder="Bedrooms e.g. 2" required>
+            <input type="number" id="price" placeholder="Price per month e.g. 45000" required>
+            <select id="type" required>
+                <option value="">Select Type</option>
+                <option value="Apartment">Apartment</option>
+                <option value="Bedsitter">Bedsitter</option>
+                <option value="1 Bedroom">1 Bedroom</option>
+                <option value="2 Bedroom">2 Bedroom</option>
+                <option value="3 Bedroom">3 Bedroom</option>
+                <option value="Maisonette">Maisonette</option>
+                <option value="Villa">Villa</option>
+            </select>
+            <input type="tel" id="phone" placeholder="WhatsApp number e.g. 0712345678" required>
+            <input type="text" id="amenities" placeholder="Amenities e.g. WiFi, Parking, Water">
 
-    <p>Fill the form below to add a new rental property.</p>
+            <!-- THIS IS THE NEW IMAGE UPLOAD PART -->
+            <label style="font-weight:bold; margin-top:15px; display:block;">Upload Photos (from your phone)</label>
+            <input type="file" id="imageFiles" accept="image/*" multiple>
+            <div id="previewImages" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;"></div>
+            <div id="uploadProgress" style="margin-top:10px; font-size:14px; color:#0d6efd; font-weight:bold;"></div>
+            
+            <p style="font-size:12px; margin-top:15px;">Or paste image URLs (optional):</p>
+            <input type="text" id="image" placeholder="Paste URLs separated by comma">
 
-    <form id="propertyForm" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
-
-        <input
-            type="text"
-            id="title"
-            placeholder="Property Title"
-            required>
-
-        <input
-            type="text"
-            id="location"
-            placeholder="Location"
-            required>
-
-        <input
-            type="number"
-            id="bedrooms"
-            placeholder="Bedrooms"
-            min="1"
-            required>
-
-        <input
-            type="number"
-            id="price"
-            placeholder="Monthly Rent"
-            min="100"
-            required>
-
-        <select id="type" required>
-            <option value="">Select Property Type</option>
-            <option>Apartment</option>
-            <option>Maisonette</option>
-            <option>Bedsitter</option>
-            <option>Studio</option>
-            <option>Office</option>
-            <option>Shop</option>
-        </select>
-
-        <input
-            type="tel"
-            id="phone"
-            placeholder="Contact Phone"
-            required>
-
-        <input
-            type="text"
-            id="amenities"
-            placeholder="Amenities">
-
-        <label>
-            <input type="checkbox" id="featured">
-            ⭐ Feature this property
-        </label>
-
-        <textarea
-            id="description"
-            rows="4"
-            placeholder="Property Description"
-            required></textarea>
-
-        <input
-            type="text"
-            id="image"
-            placeholder="Image URLs separated by commas">
-
-        <button type="submit" class="btn">
-            List Property
-        </button>
-
-        <div id="formMessage"></div>
-
-    </form>
-
+            <textarea id="description" placeholder="Describe the house..." rows="4"></textarea>
+            <label><input type="checkbox" id="featured"> Featured listing</label>
+            <button type="submit">List Property</button>
+        </form>
+        <div id="formMessage" style="margin-top:15px;"></div>
+    </div>
 </section>
 
-<div id="loadingMessage" style="text-align:center; padding:60px;">
-    <h2>Checking your account...</h2>
-</div>
-
-<footer>
-    <p>&copy; 2026 RentEasy Kenya. All Rights Reserved.</p>
-</footer>
-
 <script type="module" src="list-property.js"></script>
-
 </body>
 </html>

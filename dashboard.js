@@ -7,108 +7,187 @@ import {
     doc
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-const container = document.getElementById("dashboardProperties");
+
+const container =
+    document.getElementById("dashboardProperties");
+
 
 async function loadDashboard() {
 
     if (!container) return;
 
-    container.innerHTML = "<h3>Loading properties...</h3>";
+    container.innerHTML =
+        "<p>Loading properties...</p>";
+
 
     try {
 
-        const snapshot = await getDocs(collection(db, "properties"));
+        const snapshot =
+            await getDocs(
+                collection(db, "properties")
+            );
 
-        if (snapshot.empty) {
-            container.innerHTML = `
-                <h3>No properties found.</h3>
-                <p>Add your first property using the button above.</p>
-            `;
-            return;
-        }
 
         container.innerHTML = "";
 
-        snapshot.forEach((documentSnapshot) => {
 
-            const property = {
-                id: documentSnapshot.id,
-                ...documentSnapshot.data()
-                console.log(property);
-            };
+        if (snapshot.empty) {
 
-            const card = document.createElement("div");
+            container.innerHTML = `
+                <p>No properties have been listed yet.</p>
+            `;
+
+            return;
+        }
+
+
+        snapshot.forEach((propertyDoc) => {
+
+            const property =
+                propertyDoc.data();
+
+            const card =
+                document.createElement("div");
+
             card.className = "card";
 
+
             card.innerHTML = `
-                <img src="${property.image || "https://picsum.photos/400/250"}" alt="${property.title}">
+
+                <img
+                    src="${property.image || 'https://picsum.photos/400/250'}"
+                    alt="${property.title || 'Property'}"
+                >
 
                 <div class="card-content">
 
-                    <h3>${property.title}</h3>
+                    <h3>
+                        ${property.title || "Untitled Property"}
+                    </h3>
 
-                    <p>📍 ${property.location}</p>
+                    <p>
+                        📍 ${property.location || "Unknown location"}
+                    </p>
 
-                    <p class="price">KSh ${property.price}/month</p>
+                    <p>
+                        🛏️ ${property.rooms || "N/A"} Bedrooms
+                    </p>
 
-                    <p>${property.description}</p>
+                    <p class="price">
+                        KSh ${property.price || "0"}/month
+                    </p>
 
-                    <button class="edit-btn">✏️ Edit</button>
+                    <p>
+                        ${property.description || "No description"}
+                    </p>
 
-                    <button class="delete-btn">🗑️ Delete</button>
+
+                    <button
+                        class="details-btn edit-btn">
+                        Edit
+                    </button>
+
+
+                    <button
+                        class="whatsapp-btn delete-btn">
+                        Delete
+                    </button>
 
                 </div>
+
             `;
 
-            // EDIT PROPERTY
-            card.querySelector(".edit-btn").addEventListener("click", () => {
 
-                localStorage.setItem("editPropertyId", property.id);
+            card
+                .querySelector(".edit-btn")
+                .addEventListener("click", () => {
 
-                window.location.href = "edit-property.html";
+                    localStorage.setItem(
+                        "editPropertyId",
+                        propertyDoc.id
+                    );
 
-            });
+                    localStorage.setItem(
+                        "editProperty",
+                        JSON.stringify(property)
+                    );
 
-            // DELETE PROPERTY
-            card.querySelector(".delete-btn").addEventListener("click", async () => {
+                    alert(
+                        "Edit feature will be added next."
+                    );
 
-                const confirmed = confirm("Are you sure you want to delete this property?");
+                });
 
-                if (!confirmed) return;
 
-                try {
+            card
+                .querySelector(".delete-btn")
+                .addEventListener("click", async () => {
 
-                    await deleteDoc(doc(db, "properties", property.id));
+                    const confirmed =
+                        confirm(
+                            "Are you sure you want to delete this property?"
+                        );
 
-                    alert("Property deleted successfully.");
 
-                    loadDashboard();
+                    if (!confirmed) return;
 
-                } catch (error) {
 
-                    console.error(error);
+                    try {
 
-                    alert("Failed to delete property.");
+                        await deleteDoc(
+                            doc(
+                                db,
+                                "properties",
+                                propertyDoc.id
+                            )
+                        );
 
-                }
 
-            });
+                        card.remove();
+
+
+                        alert(
+                            "Property deleted successfully."
+                        );
+
+
+                    } catch (error) {
+
+                        console.error(error);
+
+                        alert(
+                            "Unable to delete property."
+                        );
+
+                    }
+
+                });
+
 
             container.appendChild(card);
 
         });
 
+
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Dashboard error:",
+            error
+        );
+
 
         container.innerHTML = `
-            <h3>Failed to load properties.</h3>
-            <p>${error.message}</p>
+
+            <p style="color:red;">
+                Unable to load properties.
+            </p>
+
         `;
 
     }
 
 }
+
 
 loadDashboard();

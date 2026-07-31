@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landlord Login | RentEasy Kenya</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="navbar"><div class="logo">🏠 RentEasy Kenya</div><ul class="nav-links"><li><a href="index.html">Home</a></li></ul></nav>
+<section style="max-width:450px; margin:60px auto; padding:25px; border:1px solid #ddd; border-radius:10px;">
+    <h2 id="authTitle">Landlord Login</h2>
+    <form id="authForm" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password (min 6 chars)" required>
+        <button type="submit" class="btn" id="authBtn">Login</button>
+        <div id="authMessage"></div>
+    </form>
+    <p style="margin-top:15px; text-align:center;"><a href="#" id="toggleAuth">Don't have account? Register</a></p>
+</section>
+<script type="module">
+import { auth } from "./firebase.js";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+const form = document.getElementById('authForm'), msg = document.getElementById('authMessage'), toggle = document.getElementById('toggleAuth'), title = document.getElementById('authTitle'), btn = document.getElementById('authBtn');
+let isLogin = true;
+onAuthStateChanged(auth, (user) => { if (user) window.location.href = "list-property.html"; });
+toggle.addEventListener('click', (e) => { e.preventDefault(); isLogin =!isLogin; title.textContent = isLogin? "Landlord Login" : "Landlord Register"; btn.textContent = isLogin? "Login" : "Register"; toggle.textContent = isLogin? "Don't have account? Register" : "Already have account? Login"; });
+form.addEventListener('submit', async (e) => {
+    e.preventDefault(); msg.textContent = "Please wait...";
+    const email = document.getElementById('email').value, pass = document.getElementById('password').value;
+    try { if (isLogin) { await signInWithEmailAndPassword(auth, email, pass); } else { await createUserWithEmailAndPassword(auth, email, pass); } window.location.href = "list-property.html"; } catch (err) { msg.innerHTML = `<p style="color:red;">${err.message}</p>`; }
+});
+</script>
+</body>
+</html>

@@ -49,16 +49,17 @@
 
 <script>
 
-const propertyData =
-    localStorage.getItem("selectedProperty");
-
 const container =
     document.getElementById("propertyContainer");
+
+const propertyData =
+    localStorage.getItem("selectedProperty");
 
 
 if (!propertyData) {
 
     container.innerHTML = `
+
         <h2>Property not found</h2>
 
         <p>
@@ -69,6 +70,7 @@ if (!propertyData) {
         <a href="index.html" class="btn">
             Back to Properties
         </a>
+
     `;
 
 } else {
@@ -78,45 +80,77 @@ if (!propertyData) {
         const property =
             JSON.parse(propertyData);
 
+
+        const title =
+            property.title || "Rental Property";
+
+        const location =
+            property.location || "Location not available";
+
+        const rooms =
+            property.rooms || "N/A";
+
+        const price =
+            property.price || "Price not available";
+
+        const description =
+            property.description || "No description available.";
+
+        const image =
+            property.image ||
+            "https://picsum.photos/800/500";
+
+
         container.innerHTML = `
 
             <div class="property-card">
 
                 <img
-                    src="${property.image || 'https://picsum.photos/800/500'}"
-                    alt="${property.title || 'Rental property'}"
+                    src="${image}"
+                    alt="${title}"
                     class="property-image"
                 >
+
 
                 <div class="property-content">
 
                     <h1>
-                        ${property.title || "Rental Property"}
+                        ${title}
                     </h1>
 
+
                     <p class="location">
-                        📍 ${property.location || "Location not available"}
+                        📍 ${location}
                     </p>
+
 
                     <p class="rooms">
-                        🛏️ ${property.rooms || "N/A"} Bedrooms
+                        🛏️ ${rooms} Bedrooms
                     </p>
+
 
                     <p class="price">
-                        KSh ${property.price || "Price not available"}/month
+                        KSh ${price}/month
                     </p>
 
-                    <h3>Property Description</h3>
+
+                    <h3>
+                        Property Description
+                    </h3>
+
 
                     <p>
-                        ${property.description || "No description available."}
+                        ${description}
                     </p>
 
 
-                    <h3>Location</h3>
+                    <h3>
+                        Location
+                    </h3>
+
 
                     <iframe
-                        src="https://www.google.com/maps?q=${encodeURIComponent(property.location || "Nairobi, Kenya")}&output=embed"
+                        src="https://www.google.com/maps?q=${encodeURIComponent(location)}&output=embed"
                         width="100%"
                         height="300"
                         style="border:0;"
@@ -128,20 +162,28 @@ if (!propertyData) {
 
                         <button
                             class="whatsapp-btn"
-                            onclick="contactWhatsApp()">
+                            id="whatsappButton">
+
                             Contact on WhatsApp
+
                         </button>
+
 
                         <button
                             class="details-btn"
-                            onclick="getDirections()">
+                            id="directionsButton">
+
                             📍 Get Directions
+
                         </button>
+
 
                         <a
                             href="index.html"
                             class="btn">
+
                             ← Back to Properties
+
                         </a>
 
                     </div>
@@ -153,32 +195,40 @@ if (!propertyData) {
         `;
 
 
-        window.contactWhatsApp = function () {
+        document
+            .getElementById("whatsappButton")
+            .addEventListener("click", function () {
 
-            const message =
-                `Hello, I am interested in ${property.title || "this property"} in ${property.location || "Kenya"}.`;
+                const message =
+                    `Hello, I am interested in ${title} in ${location}.`;
 
-            const url =
-                "https://wa.me/254799520544?text=" +
-                encodeURIComponent(message);
+                const whatsappURL =
+                    "https://wa.me/254799520544?text=" +
+                    encodeURIComponent(message);
 
-            window.open(url, "_blank");
+                window.open(
+                    whatsappURL,
+                    "_blank"
+                );
 
-        };
+            });
 
 
-        window.getDirections = function () {
+        document
+            .getElementById("directionsButton")
+            .addEventListener("click", function () {
 
-            const location =
-                property.location || "Nairobi, Kenya";
+                const mapsURL =
+                    "https://www.google.com/maps/search/?api=1&query=" +
+                    encodeURIComponent(location);
 
-            const url =
-                "https://www.google.com/maps/search/?api=1&query=" +
-                encodeURIComponent(location);
+                window.open(
+                    mapsURL,
+                    "_blank"
+                );
 
-            window.open(url, "_blank");
+            });
 
-        };
 
     } catch (error) {
 
@@ -187,16 +237,25 @@ if (!propertyData) {
             error
         );
 
+
         container.innerHTML = `
 
-            <h2>Unable to load property</h2>
+            <h2>
+                Unable to load property
+            </h2>
+
 
             <p>
                 There was a problem loading this property.
             </p>
 
-            <a href="index.html" class="btn">
+
+            <a
+                href="index.html"
+                class="btn">
+
                 Back to Properties
+
             </a>
 
         `;

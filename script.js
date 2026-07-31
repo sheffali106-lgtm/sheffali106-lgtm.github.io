@@ -24,12 +24,23 @@ async function loadProperties() {
       return;
     }
 
-    snapshot.forEach((documentSnapshot) => {
-      const property = documentSnapshot.data();
+    // NEW: Convert Firestore docs to an array and sort featured properties first
+    const properties = [];
+    snapshot.forEach((docSnap) => {
+      properties.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
+    });
 
-      console.log("Property loaded:", documentSnapshot.id, property);
+    properties.sort((a, b) => {
+      return (b.featured === true) - (a.featured === true);
+    });
 
-      // FIXED: Trim and handle empty strings from Firestore
+    properties.forEach((property) => {
+
+      console.log("Property loaded:", property.id, property);
+
       const title = (property.title || "").toString().trim() || "Rental Property";
       const location = (property.location || "").toString().trim() || "Location unavailable";
       const rooms = (property.rooms || "").toString().trim() || "N/A";
@@ -37,12 +48,27 @@ async function loadProperties() {
       const description = (property.description || "").toString().trim() || "No description available.";
       const image = (property.image || "").toString().trim() || "https://picsum.photos/800/500";
       const type = (property.type || "").toString().trim() || "Property";
+      const featured = property.featured === true;
 
       const card = document.createElement("div");
       card.className = "card";
 
       card.innerHTML = `
         <img src="${image}" alt="${title}" onerror="this.src='https://picsum.photos/800/500'">
+
+        ${
+          featured
+          ? `<div style="
+                background:#FFD700;
+                color:#000;
+                padding:8px;
+                text-align:center;
+                font-weight:bold;">
+                ⭐ FEATURED
+             </div>`
+          : ""
+        }
+
         <div class="card-content">
           <h3>${title}</h3>
           <p>🏢 ${type}</p>
@@ -50,6 +76,7 @@ async function loadProperties() {
           <p>🛏️ ${rooms} Bedrooms</p>
           <p class="price">KSh ${price}/month</p>
           <p>${description}</p>
+
           <button class="whatsapp-btn">Contact on WhatsApp</button>
           <button class="details-btn">View Details</button>
         </div>
@@ -67,16 +94,17 @@ async function loadProperties() {
         localStorage.setItem(
           "selectedProperty",
           JSON.stringify({
-            id: documentSnapshot.id,
-            title: title,
-            location: location,
-            rooms: rooms,
-            price: price,
-            description: description,
-            image: image
+            id: property.id,
+            title,
+            location,
+            rooms,
+            price,
+            description,
+            image
           })
         );
-        window.location.href = `property.html?id=${documentSnapshot.id}`;
+
+        window.location.href = `property.html?id=${property.id}`;
       });
 
       container.appendChild(card);

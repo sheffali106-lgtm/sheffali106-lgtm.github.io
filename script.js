@@ -20,10 +20,13 @@ async function loadProperties() {
         snapshot.forEach((doc) => {
 
             const property = doc.data();
-            
+
             console.log("Property:", property);
-            
-            const card = document.createElement("div")
+
+            // DEBUG
+            alert(JSON.stringify(property));
+
+            const card = document.createElement("div");
 
             card.className = "card";
 
@@ -49,8 +52,10 @@ async function loadProperties() {
                     <button class="details-btn">
                         View Details
                     </button>
+
                 </div>
             `;
+
             card.querySelector(".whatsapp-btn").addEventListener("click", () => {
                 window.open("https://wa.me/254799520544", "_blank");
             });
@@ -74,16 +79,20 @@ async function loadProperties() {
 
         console.error(error);
 
+        alert(error.message);
+
         container.innerHTML = `
             <h3 style="text-align:center;">
                 Unable to load properties.
             </h3>
         `;
+
     }
 
 }
 
 loadProperties();
+
 window.searchProperties = function () {
 
     const location =
@@ -111,15 +120,15 @@ window.searchProperties = function () {
 
         if (maxPrice !== "") {
 
-            const priceText =
-                card.querySelector(".price").innerText;
-
             const priceElement = card.querySelector(".price");
 
-if (!priceElement) return;
+            if (!priceElement) return;
 
-const price =
-    parseInt(priceElement.innerText.replace(/[^0-9]/g, ""));
+            const price =
+                parseInt(priceElement.innerText.replace(/[^0-9]/g, ""));
+
+            matchesPrice = price <= parseInt(maxPrice);
+
         }
 
         if (matchesLocation && matchesRooms && matchesPrice) {

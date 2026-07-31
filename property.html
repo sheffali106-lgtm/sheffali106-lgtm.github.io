@@ -25,18 +25,21 @@ import { db } from "./firebase.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const params = new URLSearchParams(window.location.search);
-const id = params.get('id');
-const container = document.getElementById('propertyDetails');
+const id = params.get("id");
+const container = document.getElementById("propertyDetails");
 
 if (!id) {
     container.innerHTML = "<p>No property ID found. Go back to <a href='index.html'>Home</a> and click View Details.</p>";
 } else {
     try {
         const snap = await getDoc(doc(db, "properties", id));
+
         if (!snap.exists()) {
             container.innerHTML = "<p>Property not found.</p>";
         } else {
+
             const p = snap.data();
+
             const location = p.location || p.area || p.town || "Location unavailable";
             const rooms = p.rooms || p.bedrooms || p.beds || "N/A";
             const price = p.price || p.rent || "Price not available";
@@ -44,20 +47,80 @@ if (!id) {
             const title = p.title || "Rental Property";
             const description = p.description || p.desc || "No description available.";
 
+            // NEW FIELDS
+            const type = p.type || "Not specified";
+            const phone = p.phone || "";
+            const amenities = p.amenities || "Not specified";
+
+            // Convert 0712345678 → 254712345678 for WhatsApp
+            let whatsappNumber = "";
+            if (phone) {
+                whatsappNumber = phone.startsWith("0")
+                    ? "254" + phone.substring(1)
+                    : phone;
+            }
+
             container.innerHTML = `
-                <img src="${image}" style="width:100%; border-radius:10px; max-height:500px; object-fit:cover;">
+                <img src="${image}"
+                     style="width:100%; border-radius:10px; max-height:500px; object-fit:cover;">
+
                 <h2 style="margin-top:20px;">${title}</h2>
-                <p>📍 ${location}</p>
-                <p>🛏️ ${rooms} Bedrooms</p>
-                <p><strong>KSh ${price}/month</strong></p>
-                <p style="margin-top:20px;"><strong>Description</strong><br>${description}</p>
-                <br>
+
+                <p>🏢 <strong>Property Type:</strong> ${type}</p>
+
+                <p>📍 <strong>Location:</strong> ${location}</p>
+
+                <p>🛏️ <strong>Bedrooms:</strong> ${rooms}</p>
+
+                <p>💰 <strong>Rent:</strong> KSh ${price}/month</p>
+
+                <p>📞 <strong>Contact:</strong> ${phone || "Not provided"}</p>
+
+                <p>✅ <strong>Amenities:</strong> ${amenities}</p>
+
+                <p style="margin-top:20px;">
+                    <strong>Description</strong><br>
+                    ${description}
+                </p>
+
+                <div style="display:flex; gap:15px; flex-wrap:wrap; margin-top:30px;">
+
+                    ${
+                        phone
+                        ? `<a href="tel:${phone}"
+                             style="background:#0d6efd; color:white; padding:12px 20px; border-radius:6px; text-decoration:none;">
+                             📞 Call Landlord
+                           </a>`
+                        : ""
+                    }
+
+                    ${
+                        whatsappNumber
+                        ? `<a href="https://wa.me/${whatsappNumber}"
+                             target="_blank"
+                             style="background:#25D366; color:white; padding:12px 20px; border-radius:6px; text-decoration:none;">
+                             💬 WhatsApp
+                           </a>`
+                        : ""
+                    }
+
+                    <a href="https://www.google.com/maps/search/${encodeURIComponent(location)}"
+                       target="_blank"
+                       style="background:#EA4335; color:white; padding:12px 20px; border-radius:6px; text-decoration:none;">
+                        📍 View on Google Maps
+                    </a>
+
+                </div>
+
+                <br><br>
+
                 <a href="index.html" style="color:#25D366;">← Back to listings</a>
             `;
         }
+
     } catch (err) {
-        container.innerHTML = `<p>Error loading: ${err.message}</p>`;
         console.error(err);
+        container.innerHTML = `<p>Error loading: ${err.message}</p>`;
     }
 }
 </script>

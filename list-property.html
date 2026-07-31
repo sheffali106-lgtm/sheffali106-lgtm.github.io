@@ -1,58 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>List Your Property - RentEasy Kenya</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>List Your Property | RentEasy Kenya</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<nav>
-<h2>🏠 RentEasy Kenya</h2>
-<ul>
-<li><a href="index.html">Home</a></li>
-<li><a href="property.html">Properties</a></li>
-</ul>
+<nav class="navbar">
+
+    <div class="logo">
+        🏠 RentEasy Kenya
+    </div>
+
+    <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#properties">Properties</a></li>
+        <li><a href="list-property.html">List Property</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+
 </nav>
 
-<section class="form-container">
 
-<h1>List Your Property</h1>
+<section class="form-section">
 
-<form>
+    <h1>List Your Property</h1>
 
-<input type="text" placeholder="Property Title" required>
+    <p>
+        Add your rental property and reach potential tenants
+        across Kenya.
+    </p>
 
-<input type="text" placeholder="Location" required>
 
-<input type="number" placeholder="Monthly Rent (KSh)" required>
+    <form id="propertyForm">
 
-<input type="text" placeholder="Bedrooms">
-<input type="number" placeholder="Bathrooms">
+        <label for="title">
+            Property Title
+        </label>
 
-<select>
-    <option>Property Type</option>
-    <option>Apartment</option>
-    <option>Maisonette</option>
-    <option>Bedsitter</option>
-    <option>Studio</option>
-    <option>Bungalow</option>
-</select>
+        <input
+            type="text"
+            id="title"
+            placeholder="e.g. Modern 2 Bedroom Apartment"
+            required
+        >
 
-<input type="tel" placeholder="Phone Number">
 
-<input type="email" placeholder="Email Address">
+        <label for="location">
+            Location
+        </label>
 
-<input type="file" accept="image/*">
-<textarea placeholder="Property Description"></textarea>
+        <input
+            type="text"
+            id="location"
+            placeholder="e.g. Kileleshwa, Nairobi"
+            required
+        >
 
-<button type="submit">📤 Submit Property</button>
 
-</form>
+        <label for="rooms">
+            Number of Bedrooms
+        </label>
+
+        <input
+            type="number"
+            id="rooms"
+            min="0"
+            placeholder="e.g. 2"
+            required
+        >
+
+
+        <label for="price">
+            Monthly Rent (KSh)
+        </label>
+
+        <input
+            type="number"
+            id="price"
+            min="0"
+            placeholder="e.g. 65000"
+            required
+        >
+
+
+        <label for="image">
+            Property Image URL
+        </label>
+
+        <input
+            type="url"
+            id="image"
+            placeholder="Paste image URL"
+            required
+        >
+
+
+        <label for="description">
+            Property Description
+        </label>
+
+        <textarea
+            id="description"
+            rows="6"
+            placeholder="Describe the property, amenities, security, parking, etc."
+            required
+        ></textarea>
+
+
+        <button
+            type="submit"
+            class="btn">
+            Add Property
+        </button>
+
+    </form>
+
+
+    <p id="message"></p>
 
 </section>
+
+
+<footer>
+
+    <p>
+        &copy; 2026 RentEasy Kenya. All Rights Reserved.
+    </p>
+
+</footer>
+
+
+<script type="module">
+
+import { db } from "./firebase.js";
+
+import {
+    collection,
+    addDoc
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+
+const form =
+    document.getElementById("propertyForm");
+
+const message =
+    document.getElementById("message");
+
+
+form.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+
+    const title =
+        document.getElementById("title").value.trim();
+
+    const location =
+        document.getElementById("location").value.trim();
+
+    const rooms =
+        document.getElementById("rooms").value.trim();
+
+    const price =
+        document.getElementById("price").value.trim();
+
+    const image =
+        document.getElementById("image").value.trim();
+
+    const description =
+        document.getElementById("description").value.trim();
+
+
+    message.textContent =
+        "Adding property...";
+
+
+    try {
+
+        await addDoc(
+            collection(db, "properties"),
+            {
+                title: title,
+                location: location,
+                rooms: rooms,
+                price: price,
+                image: image,
+                description: description
+            }
+        );
+
+
+        message.textContent =
+            "✅ Property added successfully!";
+
+
+        form.reset();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        message.textContent =
+            "❌ Failed to add property. Please try again.";
+
+    }
+
+});
+
+</script>
+
 
 </body>
 </html>

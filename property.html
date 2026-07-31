@@ -43,16 +43,20 @@ if (!id) {
             const location = p.location || p.area || p.town || "Location unavailable";
             const rooms = p.rooms || p.bedrooms || p.beds || "N/A";
             const price = p.price || p.rent || "Price not available";
-            const image = p.image || p.imageUrl || p.photo || "https://picsum.photos/800/500";
             const title = p.title || "Rental Property";
             const description = p.description || p.desc || "No description available.";
 
-            // NEW FIELDS
             const type = p.type || "Not specified";
             const phone = p.phone || "";
             const amenities = p.amenities || "Not specified";
 
-            // Convert 0712345678 → 254712345678 for WhatsApp
+            // Support both old and new listings
+            const images = Array.isArray(p.images) && p.images.length > 0
+                ? p.images
+                : [p.image || p.imageUrl || p.photo || "https://picsum.photos/800/500"];
+
+            let currentImage = 0;
+
             let whatsappNumber = "";
             if (phone) {
                 whatsappNumber = phone.startsWith("0")
@@ -61,8 +65,14 @@ if (!id) {
             }
 
             container.innerHTML = `
-                <img src="${image}"
-                     style="width:100%; border-radius:10px; max-height:500px; object-fit:cover;">
+                <img id="galleryImage"
+                     src="${images[0]}"
+                     style="width:100%;border-radius:10px;max-height:500px;object-fit:cover;">
+
+                <div style="display:flex;justify-content:space-between;margin-top:15px;">
+                    <button id="prevImage">◀ Previous</button>
+                    <button id="nextImage">Next ▶</button>
+                </div>
 
                 <h2 style="margin-top:20px;">${title}</h2>
 
@@ -83,9 +93,7 @@ if (!id) {
                     ${description}
                 </p>
 
-                <div style="display:flex; gap:15px; flex-wrap:wrap; margin-top:30px;">
-
-                    ${
+                <div style="display:flex;gap:15px;flex-wrap:wrap;margin-top:30px;">                    ${
                         phone
                         ? `<a href="tel:${phone}"
                              style="background:#0d6efd; color:white; padding:12px 20px; border-radius:6px; text-decoration:none;">
@@ -116,6 +124,35 @@ if (!id) {
 
                 <a href="index.html" style="color:#25D366;">← Back to listings</a>
             `;
+
+            // ===============================
+            // IMAGE GALLERY
+            // ===============================
+            const galleryImage = document.getElementById("galleryImage");
+            const prevImage = document.getElementById("prevImage");
+            const nextImage = document.getElementById("nextImage");
+
+            if (images.length <= 1) {
+                prevImage.style.display = "none";
+                nextImage.style.display = "none";
+            } else {
+
+                prevImage.addEventListener("click", () => {
+                    currentImage =
+                        (currentImage - 1 + images.length) % images.length;
+
+                    galleryImage.src = images[currentImage];
+                });
+
+                nextImage.addEventListener("click", () => {
+                    currentImage =
+                        (currentImage + 1) % images.length;
+
+                    galleryImage.src = images[currentImage];
+                });
+
+            }
+
         }
 
     } catch (err) {

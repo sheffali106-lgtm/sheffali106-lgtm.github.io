@@ -21,7 +21,7 @@
     </ul>
 </nav>
 
-<section style="max-width:700px; margin:40px auto; padding:20px;">
+<section id="propertySection" style="max-width:700px; margin:40px auto; padding:20px; display:none;">
 
     <h2>List Your Property</h2>
 
@@ -102,118 +102,15 @@
 
 </section>
 
+<div id="loadingMessage" style="text-align:center; padding:60px;">
+    <h2>Checking your account...</h2>
+</div>
+
 <footer>
     <p>&copy; 2026 RentEasy Kenya. All Rights Reserved.</p>
 </footer>
 
-<script type="module">import { app, db } from "./firebase.js";
-
-import {
-    getAuth,
-    onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-
-import {
-    collection,
-    addDoc,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
-
-const auth = getAuth(app);
-
-const form = document.getElementById("propertyForm");
-const messageDiv = document.getElementById("formMessage");
-
-let currentUser = null;
-
-onAuthStateChanged(auth, (user) => {
-
-    if (!user) {
-        window.location.href = "login.html";
-        return;
-    }
-
-    currentUser = user;
-
-});
-
-form.addEventListener("submit", async (e) => {
-
-    e.preventDefault();
-
-    if (!currentUser) {
-        messageDiv.innerHTML = "<p style='color:red;'>Please wait...</p>";
-        return;
-    }
-
-    const title = document.getElementById("title").value.trim();
-    const location = document.getElementById("location").value.trim();
-    const bedrooms = parseInt(document.getElementById("bedrooms").value);
-    const price = parseInt(document.getElementById("price").value);
-
-    const type = document.getElementById("type").value;
-    const phone = document.getElementById("phone").value.trim();
-    const amenities = document.getElementById("amenities").value.trim();
-    const featured = document.getElementById("featured").checked;
-    const description = document.getElementById("description").value.trim();
-
-    const imageInput = document.getElementById("image").value.trim();
-
-    const images = imageInput
-        ? imageInput.split(",").map(url => url.trim()).filter(url => url)
-        : ["https://picsum.photos/800/500"];
-
-    try {
-
-        await addDoc(collection(db, "properties"), {
-
-            ownerId: currentUser.uid,
-            ownerEmail: currentUser.email,
-
-            title,
-            location,
-
-            rooms: bedrooms,
-            bedrooms,
-
-            price,
-            rent: price,
-
-            type,
-            phone,
-            amenities,
-            featured,
-
-            description,
-
-            image: images[0],
-            imageUrl: images[0],
-            images,
-
-            createdAt: serverTimestamp()
-
-        });
-
-        messageDiv.innerHTML =
-            "<p style='color:green;'>✅ Property listed successfully!</p>";
-
-        form.reset();
-
-        setTimeout(() => {
-            window.location.href = "dashboard.html";
-        }, 1500);
-
-    } catch (error) {
-
-        console.error(error);
-
-        messageDiv.innerHTML =
-            `<p style="color:red;">${error.message}</p>`;
-
-    }
-
-});
-</script>
+<script type="module" src="list-property.js"></script>
 
 </body>
 </html>

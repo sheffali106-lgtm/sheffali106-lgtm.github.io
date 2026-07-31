@@ -1,30 +1,23 @@
-/* ==========================
-   RentEasy Kenya
-   Part 1
-========================== */
-
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
 }
 
 body{
-    font-family:Arial, Helvetica, sans-serif;
-    background:#f5f5f5;
+    background:#f5f7fa;
     color:#333;
     line-height:1.6;
 }
 
-/* Navigation */
-
 .navbar{
-    background:#0b8457;
-    color:white;
-    padding:15px 8%;
     display:flex;
     justify-content:space-between;
     align-items:center;
+    background:#0b5ed7;
+    color:#fff;
+    padding:15px 8%;
     flex-wrap:wrap;
 }
 
@@ -40,21 +33,20 @@ body{
 }
 
 .nav-links a{
-    color:white;
+    color:#fff;
     text-decoration:none;
     font-weight:bold;
 }
 
 .nav-links a:hover{
-    color:#ffe082;
+    text-decoration:underline;
 }
 
-/* Hero */
-
 .hero{
-    background:white;
+    background:#0d6efd;
+    color:white;
     text-align:center;
-    padding:60px 20px;
+    padding:80px 20px;
 }
 
 .hero h1{
@@ -64,51 +56,19 @@ body{
 
 .hero p{
     font-size:18px;
-    margin-bottom:25px;
-    color:#666;
 }
 
-/* Search */
-
-.search-box{
-    display:flex;
-    justify-content:center;
-    gap:10px;
-    flex-wrap:wrap;
+.featured,
+.why-us,
+.cta{
+    padding:50px 8%;
 }
 
-.search-box input{
-    width:320px;
-    max-width:90%;
-    padding:12px;
-    border:1px solid #ccc;
-    border-radius:6px;
-}
-
-.search-box button{
-    padding:12px 20px;
-    background:#0b8457;
-    color:white;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-}
-
-.search-box button:hover{
-    background:#086b46;
-}
-/* ==========================
-   Property Cards
-========================== */
-
-.featured{
-    padding:60px 8%;
-}
-
-.featured h2{
+.featured h2,
+.why-us h2,
+.cta h2{
     text-align:center;
-    margin-bottom:35px;
-    font-size:32px;
+    margin-bottom:30px;
 }
 
 .properties{
@@ -121,12 +81,12 @@ body{
     background:#fff;
     border-radius:12px;
     overflow:hidden;
-    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    box-shadow:0 4px 12px rgba(0,0,0,.1);
     transition:.3s;
 }
 
 .card:hover{
-    transform:translateY(-6px);
+    transform:translateY(-5px);
 }
 
 .card img{
@@ -143,143 +103,90 @@ body{
     margin-bottom:10px;
 }
 
-.card-content p{
-    margin:8px 0;
-}
-
 .price{
-    color:#0b8457;
+    color:#0b5ed7;
     font-size:22px;
     font-weight:bold;
+    margin:10px 0;
 }
 
-/* Buttons */
-
 .whatsapp-btn,
-.details-btn{
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
+.details-btn,
+.btn{
+    display:inline-block;
     margin-top:10px;
+    padding:12px 18px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    text-decoration:none;
+    color:white;
     font-size:16px;
 }
 
 .whatsapp-btn{
     background:#25D366;
-    color:white;
-}
-
-.whatsapp-btn:hover{
-    background:#1ebd5a;
 }
 
 .details-btn{
-    background:#0b8457;
-    color:white;
+    background:#0d6efd;
 }
 
-.details-btn:hover{
-    background:#086b46;
-}
-
-/* ==========================
-   Why Choose Us
-========================== */
-
-.why-us{
-    background:#ffffff;
-    padding:60px 8%;
-}
-
-.why-us h2{
-    text-align:center;
-    margin-bottom:35px;
-    font-size:32px;
+.btn{
+    background:#198754;
 }
 
 .features{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:25px;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
 }
 
 .feature{
-    background:#f9f9f9;
-    padding:25px;
-    border-radius:10px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.08);
-}
-
-.feature h3{
-    margin-bottom:12px;
-    color:#0b8457;
-}
-
-/* CTA */
-
-.cta{
-    background:#0b8457;
-    color:white;
-    text-align:center;
-    padding:60px 20px;
-}
-
-.cta h2{
-    margin-bottom:15px;
-    font-size:32px;
-}
-
-.cta p{
-    margin-bottom:25px;
-    font-size:18px;
-}
-
-.btn{
-    display:inline-block;
-    padding:14px 28px;
     background:white;
-    color:#0b8457;
-    text-decoration:none;
-    font-weight:bold;
-    border-radius:8px;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
-.btn:hover{
-    opacity:0.9;
+.property-details{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:40px;
+    padding:40px 8%;
 }
 
-/* Footer */
+.gallery img{
+    width:100%;
+    border-radius:12px;
+}
 
 footer{
     background:#222;
     color:white;
     text-align:center;
     padding:20px;
+    margin-top:40px;
 }
 
-/* Mobile */
+@media(max-width:768px){
 
-@media (max-width:768px){
+.navbar{
+    flex-direction:column;
+    gap:15px;
+}
 
-    .navbar{
-        flex-direction:column;
-        gap:15px;
-        text-align:center;
-    }
+.nav-links{
+    flex-direction:column;
+    align-items:center;
+}
 
-    .nav-links{
-        flex-direction:column;
-        gap:12px;
-    }
+.hero h1{
+    font-size:30px;
+}
 
-    .hero h1{
-        font-size:30px;
-    }
+.property-details{
+    grid-template-columns:1fr;
+}
 
-    .featured,
-    .why-us{
-        padding:40px 5%;
-    }
 }

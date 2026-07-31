@@ -33,7 +33,6 @@
 
         <input type="number" id="price" placeholder="Price per month e.g. 65000" min="100" required>
 
-        <!-- NEW -->
         <select id="type" required>
             <option value="">Select Property Type</option>
             <option>Apartment</option>
@@ -44,11 +43,15 @@
             <option>Shop</option>
         </select>
 
-        <!-- NEW -->
         <input type="tel" id="phone" placeholder="Contact Phone e.g. 0712345678" required>
 
-        <!-- NEW -->
         <input type="text" id="amenities" placeholder="Amenities e.g. Parking, CCTV, WiFi, Borehole">
+
+        <!-- NEW FEATURED PROPERTY -->
+        <label style="display:flex; align-items:center; gap:10px;">
+            <input type="checkbox" id="featured">
+            ⭐ Feature this property
+        </label>
 
         <textarea id="description" placeholder="Property Description" rows="4" required></textarea>
 
@@ -82,10 +85,12 @@ form.addEventListener("submit", async (e) => {
     const bedroomsValue = document.getElementById("bedrooms").value.trim();
     const priceValue = document.getElementById("price").value.trim();
 
-    // NEW
     const type = document.getElementById("type").value;
     const phone = document.getElementById("phone").value.trim();
     const amenities = document.getElementById("amenities").value.trim();
+
+    // NEW
+    const featured = document.getElementById("featured").checked;
 
     const description = document.getElementById("description").value.trim();
     const image = document.getElementById("image").value.trim();
@@ -114,10 +119,12 @@ form.addEventListener("submit", async (e) => {
             price: price,
             rent: price,
 
-            // NEW
             type: type,
             phone: phone,
             amenities: amenities,
+
+            // NEW
+            featured: featured,
 
             description: description,
 

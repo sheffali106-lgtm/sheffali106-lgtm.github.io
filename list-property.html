@@ -47,7 +47,6 @@
 
         <input type="text" id="amenities" placeholder="Amenities e.g. Parking, CCTV, WiFi, Borehole">
 
-        <!-- NEW FEATURED PROPERTY -->
         <label style="display:flex; align-items:center; gap:10px;">
             <input type="checkbox" id="featured">
             ⭐ Feature this property
@@ -55,9 +54,16 @@
 
         <textarea id="description" placeholder="Property Description" rows="4" required></textarea>
 
-        <input type="url" id="image" placeholder="Image URL (optional) - e.g. https://...">
+        <input
+            type="text"
+            id="image"
+            placeholder="Image URLs separated by commas
+Example:
+https://image1.jpg, https://image2.jpg, https://image3.jpg">
 
-        <button type="submit" class="btn" style="background:#25D366; color:white; padding:12px; border:none; border-radius:6px; cursor:pointer;">
+        <button type="submit"
+            class="btn"
+            style="background:#25D366;color:white;padding:12px;border:none;border-radius:6px;cursor:pointer;">
             List Property
         </button>
 
@@ -72,7 +78,11 @@
 
 <script type="module">
 import { db } from "./firebase.js";
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import {
+    collection,
+    addDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 const form = document.getElementById("propertyForm");
 const messageDiv = document.getElementById("formMessage");
@@ -88,12 +98,20 @@ form.addEventListener("submit", async (e) => {
     const type = document.getElementById("type").value;
     const phone = document.getElementById("phone").value.trim();
     const amenities = document.getElementById("amenities").value.trim();
-
-    // NEW
     const featured = document.getElementById("featured").checked;
 
     const description = document.getElementById("description").value.trim();
-    const image = document.getElementById("image").value.trim();
+
+    const imageInput = document.getElementById("image").value.trim();
+
+    const images = imageInput
+        ? imageInput
+            .split(",")
+            .map(url => url.trim())
+            .filter(url => url !== "")
+        : ["https://picsum.photos/800/500"];
+
+    const image = images[0];
 
     if (!title || !location || !bedroomsValue || !priceValue || !type || !phone || !description) {
         messageDiv.innerHTML = `<p style="color:red;">Please fill all required fields</p>`;
@@ -123,13 +141,11 @@ form.addEventListener("submit", async (e) => {
             phone: phone,
             amenities: amenities,
 
-            // NEW
             featured: featured,
 
-            description: description,
-
-            image: image || "https://picsum.photos/800/500",
-            imageUrl: image || "https://picsum.photos/800/500",
+            description: description,            image: image,
+            imageUrl: image,
+            images: images,
 
             createdAt: serverTimestamp()
         });

@@ -1,37 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Landlord Dashboard | RentEasy Kenya</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <nav class="navbar">
-    <div class="logo">🏠 RentEasy Kenya</div>
+
+    <div class="logo">
+        🏠 RentEasy Kenya
+    </div>
+
+    <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#properties">Properties</a></li>
+        <li><a href="list-property.html">List Property</a></li>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+    </ul>
+
 </nav>
 
-<section class="featured">
 
-    <h2>Landlord Dashboard</h2>
+<section class="dashboard">
 
-    <p>Manage all your rental properties from one place.</p>
+    <h1>Landlord Dashboard</h1>
 
     <p>
-        <a class="btn" href="list-property.html">
-            ➕ Add New Property
-        </a>
+        Manage your rental properties below.
     </p>
 
-    <div id="dashboardProperties" class="properties">
+    <a href="list-property.html" class="btn">
+        ➕ Add New Property
+    </a>
 
-        <!-- Properties will appear here -->
+
+    <div id="dashboardProperties">
+
+        <p>Loading properties...</p>
 
     </div>
 
 </section>
+
+
+<footer>
+
+    <p>
+        &copy; 2026 RentEasy Kenya. All Rights Reserved.
+    </p>
+
+</footer>
+
 
 <script type="module" src="dashboard.js"></script>
 

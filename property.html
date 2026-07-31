@@ -224,10 +224,12 @@ if (!id) {
                     html = "<p>No similar properties found.</p>";
                 }
 
-                similarContainer.innerHTML = html;
+                                similarContainer.innerHTML = html;
             }
 
-        } catch (err) {
+        }
+
+    } catch (err) {
         console.error(err);
         container.innerHTML = `<p>Error loading: ${err.message}</p>`;
     }

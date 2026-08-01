@@ -1,62 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RentEasy Kenya</title>
-<link rel="icon" href="logo.png">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter,system-ui,sans-serif;background:#fff;color:#111}
-.navbar{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:#fff;border-bottom:1px solid #eee;position:sticky;top:0;z-index:1000}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px}
-.logo img{height:52px;width:auto}
-.hamburger{display:flex;flex-direction:column;gap:6px;cursor:pointer;padding:8px}
-.hamburger span{display:block;width:34px;height:5px;background:#0a6ab5;border-radius:2px}
-.side-menu{position:fixed;top:0;right:-100%;width:80%;max-width:320px;height:100%;background:#fff;box-shadow:-4px 0 20px rgba(0,0,0,0.15);z-index:2000;transition:0.3s ease;padding:20px}
-.side-menu.active{right:0}
-.side-menu .close{font-size:32px;cursor:pointer;text-align:right;margin-bottom:20px}
-.side-menu a{display:block;padding:14px 0;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#111;font-size:18px;font-weight:500}
-.side-menu a.pay{background:#16a34a;color:#fff;padding:12px;border-radius:10px;text-align:center;margin-top:10px;border:none}
-.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:1500;display:none}
-.overlay.active{display:block}
-.hero{padding:10px 18px 20px}
-.properties{display:grid;grid-template-columns:1fr;gap:16px;padding:16px}
-@media(min-width:600px){.properties{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}}
-.property-card{border:1px solid #eee;border-radius:16px;overflow:hidden;background:white;box-shadow:0 4px 12px rgba(0,0,0,0.06)}
-#dynamicProperties{padding:10px}
-#dynamicProperties a{display:inline-flex!important;justify-content:center;align-items:center;background:#0a6ab5!important;color:white!important;padding:10px 22px!important;border-radius:10px!important;text-decoration:none!important;font-weight:700!important;font-size:15px!important;border:none!important;margin:8px 6px!important;min-width:90px}
-#dynamicProperties button{display:inline-flex!important;justify-content:center;align-items:center;background:white!important;color:#0a6ab5!important;padding:10px 22px!important;border-radius:10px!important;font-weight:700!important;font-size:15px!important;border:2px solid #0a6ab5!important;margin:8px 6px!important;min-width:100px;cursor:pointer}
-</style>
-</head>
-<body>
-<nav class="navbar">
-  <div class="logo"><img src="logo.png" alt="RentEasy"><span>RentEasy <span style="color:#16a34a;">Kenya</span></span></div>
-  <div class="hamburger" onclick="openMenu()"><span></span><span></span><span></span></div>
-</nav>
-<div class="overlay" id="overlay" onclick="closeMenu()"></div>
-<div class="side-menu" id="sideMenu">
-  <div class="close" onclick="closeMenu()">&times;</div>
-  <a href="index.html">🏠 Home</a>
-  <a href="index.html#properties">🏢 Apartments for Rent</a>
-  <!-- FIXED: Now goes to pay-to-list.html -->
-  <a href="pay-to-list.html" class="pay">➕ List Your Property - Pay 300/500 to 0799520544</a>
-  <a href="dashboard.html">📊 Dashboard</a>
-  <a href="login.html">🔑 Login</a>
-  <p style="font-size:11px;color:#777;margin-top:20px">Tenants: You pay landlord directly via WhatsApp. No M-Pesa rent on site.</p>
-</div>
+RentEasy Kenya
+☰
+Find Your Perfect Home in Kenya
+Umoja, Kasarani, Kileleshwa, Kilimani, Westlands
 
-<div class="hero">
-  <h1>Apartments for rent in Nairobi</h1>
-  <p style="color:#555;margin-top:8px;">Browse verified apartments across Kenya.</p>
-  <p style="color:#16a34a;font-weight:700;font-size:12px;margin-top:6px">M-Pesa ONLY for landlords: Ksh 300 (<15k) / 500 (>15k) to 0799520544</p>
-</div>
+TENANTS: Pay landlord directly via WhatsApp - No M-Pesa rent here
 
-<div id="dynamicProperties" class="properties"><p style="text-align:center;width:100%">Loading...</p></div>
+Search: Umoja, 2 bedroom...
+Search
+M-Pesa for Landlords ONLY: 300 (<15k) / 500 (>15k) to 0799520544
+Featured Properties
+Loading properties...
 
-<script>
-function openMenu(){document.getElementById('sideMenu').classList.add('active');document.getElementById('overlay').classList.add('active')}
-function closeMenu(){document.getElementById('sideMenu').classList.remove('active');document.getElementById('overlay').classList.remove('active')}
-</script>
-<script type="module" src="script.js"></script>
-</body>
-</html>
+✅ Verified Listings
+Trusted homes from real landlords.
+
+💬 WhatsApp Direct
+Tenants chat landlords directly. You pay landlord, not us.
+
+🏠 Landlords
+Pay Ksh 300 (below 15k) or 500 (above 15k) via M-Pesa 0799520544 to showcase.
+
+Are You a Landlord?
+Showcase to 1000s of tenants
+
+Pay Ksh 300 if rent < 15k, Ksh 500 if rent > 15k to
+M-Pesa 0799520544
+
+List Your Property Now →
+Tenant rent is between landlord & tenant only
+
+© 2026 RentEasy Kenya
+Landlords Lipa 0799520544 to list | Tenants: WhatsApp landlord only

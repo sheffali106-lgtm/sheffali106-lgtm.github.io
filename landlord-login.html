@@ -1,55 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landlord Login | RentEasy Kenya</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-<nav class="navbar"><div class="logo">🏠 RentEasy Kenya</div><ul class="nav-links"><li><a href="index.html">Home</a></li></ul></nav>
-<section style="max-width:450px; margin:60px auto; padding:25px; border:1px solid #ddd; border-radius:10px;">
-    <h2 id="authTitle">Landlord Login</h2>
-    <p id="loggedInfo" style="display:none; background:#e7f5ff; padding:10px; border-radius:5px; margin-top:10px;"></p>
-    <form id="authForm" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
-        <input type="email" id="email" placeholder="Email" required>
-        <input type="password" id="password" placeholder="Password (min 6 chars)" required>
-        <button type="submit" class="btn" id="authBtn">Login</button>
-        <div id="authMessage"></div>
-    </form>
-    <p style="margin-top:15px; text-align:center;"><a href="#" id="toggleAuth">Don't have account? Register</a></p>
-    <button id="logoutBtn" style="display:none; margin-top:15px; width:100%; padding:10px; background:#dc3545; color:white; border:none; border-radius:5px; cursor:pointer;">Logout</button>
-</section>
-<script type="module">
-import { auth } from "./firebase.js";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-const form = document.getElementById('authForm'), msg = document.getElementById('authMessage'), toggle = document.getElementById('toggleAuth'), title = document.getElementById('authTitle'), btn = document.getElementById('authBtn'), logoutBtn = document.getElementById('logoutBtn'), loggedInfo = document.getElementById('loggedInfo');
-let isLogin = true;
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        loggedInfo.style.display="block";
-        loggedInfo.textContent = `Logged in as: ${user.email} - Redirecting to listing...`;
-        logoutBtn.style.display="block";
-        form.style.display="none";
-        toggle.style.display="none";
-        setTimeout(()=> window.location.href = "list-property.html", 1500);
-    } else {
-        loggedInfo.style.display="none";
-        logoutBtn.style.display="none";
-        form.style.display="flex";
-        toggle.style.display="block";
-    }
-});
-toggle.addEventListener('click', (e) => { e.preventDefault(); isLogin=!isLogin; title.textContent = isLogin? "Landlord Login" : "Landlord Register"; btn.textContent = isLogin? "Login" : "Register"; toggle.textContent = isLogin? "Don't have account? Register" : "Already have account? Login"; });
-form.addEventListener('submit', async (e) => {
-    e.preventDefault(); msg.textContent = "Please wait...";
-    const email = document.getElementById('email').value, pass = document.getElementById('password').value;
-    try { 
-        if (isLogin) await signInWithEmailAndPassword(auth, email, pass); 
-        else await createUserWithEmailAndPassword(auth, email, pass); 
-        window.location.href = "list-property.html"; 
-    } catch (err) { msg.innerHTML = `<p style="color:red;">${err.message}</p>`; }
-});
-logoutBtn.addEventListener('click', async()=>{ await signOut(auth); msg.innerHTML = `<p style="color:green;">Logged out. Now test login.</p>`; });
-</script>
-</body>
-</html>
+List Your Property
+Tenant will WhatsApp you directly - No broker
+
+Checking payment...
+Title e.g. 2 Bedroom in Umoja
+2 Bedroom Apartment
+Location
+
+Umoja
+Rent per Month (Ksh)
+e.g. 18000
+Bedrooms
+
+1
+Your WhatsApp Number (Tenant will contact you)
+e.g. 07XXXXXXXX
+Description
+Water 24/7, near road...
+Image URL (or upload later in dashboard)
+https://...
+ Publish Property
+Back to Home

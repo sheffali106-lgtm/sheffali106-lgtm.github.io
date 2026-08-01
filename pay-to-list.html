@@ -1,82 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pay to List - RentEasy Kenya</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter,sans-serif;background:#f5f7fb;padding:18px}
-.card{max-width:480px;margin:20px auto;background:#fff;border-radius:20px;padding:24px;box-shadow:0 8px 30px rgba(0,0,0,0.08)}
-h1{font-size:24px;margin-bottom:8px}
-.input{width:100%;padding:14px;border:1px solid #ddd;border-radius:12px;margin:10px 0;font-size:16px}
-.mpesa-box{background:#e8f5e9;border:2px dashed #16a34a;border-radius:14px;padding:18px;text-align:center;margin:16px 0}
-.price-tag{font-size:32px;font-weight:800;color:#16a34a}
-.btn{width:100%;padding:16px;background:#111;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-top:10px}
-.btn-green{background:#16a34a}
-.steps{background:#f9fafb;padding:14px;border-radius:12px;font-size:14px;line-height:1.6;margin-top:14px}
-</style>
-</head>
-<body>
+Lipa Na M-Pesa
+Pay to list your property on RentEasy Kenya
 
-<div class="card">
-  <h1>Lipa Na M-Pesa</h1>
-  <p style="color:#666;">Pay to list your property on RentEasy Kenya</p>
+Property Rent Amount (Ksh)
+e.g. 20000
+How to pay (Phone):
+1. Open M-Pesa → Send Money
+2. Enter Number: 0799520544 (Ben Karari)
+3. Enter Amount: 0
+4. Enter M-Pesa PIN → Send
+5. Copy M-Pesa Code (e.g. QGH7...) and paste below
+M-Pesa Transaction Code
+e.g. QGH7X8Y9Z0
+ ✅ I Have Paid - Continue to List
+Cancel
+Tenants don't pay via M-Pesa here. They contact you via WhatsApp. This payment is only for landlords to showcase.
 
-  <label>Property Rent Amount (Ksh)</label>
-  <input type="number" id="rent" class="input" placeholder="e.g. 20000" oninput="calcPrice()">
-
-  <div class="mpesa-box" id="priceBox" style="display:none;">
-    <p>You Should Pay</p>
-    <div class="price-tag" id="payAmount">Ksh 0</div>
-    <p id="priceInfo" style="font-size:13px;color:#555;margin-top:4px;"></p>
-  </div>
-
-  <div class="steps">
-    <b>How to pay:</b><br>
-    1. Go to M-Pesa → Lipa Na M-Pesa → Buy Goods and Services<br>
-    2. Enter Till / Send Money to: <b style="color:#16a34a;font-size:18px;">0799520544</b><br>
-    3. Enter Amount shown above<br>
-    4. Enter M-Pesa PIN → Send<br>
-    5. Copy M-Pesa Code (e.g. QGH7...) and paste below
-  </div>
-
-  <label style="margin-top:16px;display:block;">M-Pesa Transaction Code</label>
-  <input type="text" id="mpesaCode" class="input" placeholder="e.g. QGH7X8Y9Z0">
-
-  <button class="btn btn-green" onclick="verifyPay()">✅ I Have Paid - Continue to List</button>
-  <a href="index.html" style="display:block;text-align:center;margin-top:14px;color:#666;text-decoration:none;">Cancel</a>
-
-  <p style="font-size:12px;color:#999;text-align:center;margin-top:18px;">For help: Call/WhatsApp 0799520544</p>
-</div>
-
-<script>
-let finalAmount = 0;
-function calcPrice(){
-  let rent = parseInt(document.getElementById('rent').value) || 0;
-  if(rent <= 0){ document.getElementById('priceBox').style.display='none'; return; }
-  document.getElementById('priceBox').style.display='block';
-  if(rent < 15000){
-    finalAmount = 300;
-    document.getElementById('payAmount').textContent = 'Ksh 300';
-    document.getElementById('priceInfo').textContent = 'Because rent is below 15,000';
-  } else {
-    finalAmount = 500;
-    document.getElementById('payAmount').textContent = 'Ksh 500';
-    document.getElementById('priceInfo').textContent = 'Because rent is above 15,000';
-  }
-}
-function verifyPay(){
-  let rent = document.getElementById('rent').value;
-  let code = document.getElementById('mpesaCode').value.trim();
-  if(!rent){ alert('Enter rent amount'); return; }
-  if(code.length < 6){ alert('Enter valid M-Pesa code'); return; }
-  // Save to localStorage for verification
-  localStorage.setItem('renteasy_paid', 'yes');
-  localStorage.setItem('renteasy_mpesa_code', code);
-  localStorage.setItem('renteasy_amount', finalAmount);
-  alert('Payment received! Code: ' + code + ' - Redirecting to list property...');
-  window.location.href = 'landlord-login.html';
-}
-</script>
-</body>
-</html>
+Help: Call/WhatsApp 0799520544

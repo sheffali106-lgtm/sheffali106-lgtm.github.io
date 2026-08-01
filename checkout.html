@@ -18,21 +18,22 @@
   <div id="propInfo">Loading...</div>
   
   <div class="mpesa-box">
-    <h3>Paybill / Till: 522</h3>
-    <p>Account No: RENTEASY</p>
-    <p>Or Till: <strong>5847835</strong></p>
-    <small>Change to YOUR real Till before presentation</small>
+    <h3 style="margin:0;">Pay to M-Pesa Number</h3>
+    <h1 style="margin:10px 0; font-size:28px;">0799520544</h1>
+    <p style="margin:0;">Name: Ben Karari</p>
+    <p style="margin:5px 0; font-size:14px;">Send Money → Enter this number</p>
   </div>
 
-  <p>1. Go to M-Pesa on phone</p>
-  <p>2. Lipa na M-Pesa → Buy Goods → Enter Till</p>
-  <p>3. Enter Amount</p>
+  <p><b>How to pay:</b></p>
+  <p>1. Go to M-Pesa → Send Money</p>
+  <p>2. Enter Number: <b>0799520544</b></p>
+  <p>3. Enter Amount (Deposit amount shown)</p>
   <p>4. Enter PIN → You get SMS code e.g. QGH7...</p>
 
   <h3>Confirm Payment</h3>
-  <input type="text" id="mpesaCode" placeholder="Enter M-Pesa Code e.g. QGH7RTU..." style="width:100%; padding:10px; margin:5px 0;">
-  <input type="text" id="phone" placeholder="Your M-Pesa Phone 07..." style="width:100%; padding:10px; margin:5px 0;">
-  <button onclick="confirmPayment()" class="btn" style="width:100%; background:#00a651;">I Have Paid - Confirm</button>
+  <input type="text" id="mpesaCode" placeholder="Enter M-Pesa Code e.g. QGH7RTU..." style="width:100%; padding:10px; margin:5px 0; border:1px solid #ccc; border-radius:8px;">
+  <input type="text" id="phone" placeholder="Your M-Pesa Phone 07..." style="width:100%; padding:10px; margin:5px 0; border:1px solid #ccc; border-radius:8px;">
+  <button onclick="confirmPayment()" class="btn" style="width:100%; background:#00a651; padding:12px;">I Have Paid - Confirm</button>
   
   <p id="status" style="margin-top:10px;"></p>
 </div>
@@ -53,7 +54,7 @@ async function loadProp() {
   const snap = await getDoc(doc(db, "properties", propertyId));
   if (snap.exists()) {
     propertyData = snap.data();
-    document.getElementById("propInfo").innerHTML = `<h3>${propertyData.title}</h3><p>${propertyData.location}</p><p><strong>Ksh ${propertyData.price} Deposit</strong></p>`;
+    document.getElementById("propInfo").innerHTML = `<h3>${propertyData.title}</h3><p>${propertyData.location}</p><p><strong style="color:#00a651;">Ksh ${propertyData.price} Deposit</strong></p>`;
   }
 }
 loadProp();
@@ -72,11 +73,12 @@ window.confirmPayment = async () => {
     mpesaCode: code,
     phone: phone,
     amount: propertyData.price,
+    recipientNumber: "0799520544",
     status: "pending",
     createdAt: new Date()
   });
   
-  document.getElementById("status").innerHTML = "✅ Payment recorded! Code: "+code+" <br> Landlord will verify and contact you. <br><br><a href='dashboard.html'>Go to Dashboard</a>";
+  document.getElementById("status").innerHTML = "✅ Payment recorded! Code: "+code+" <br> Sent to 0799520544<br> Landlord will verify and contact you. <br><br><a href='dashboard.html' class='btn' style='background:#00a651; color:white; padding:10px; display:block; text-align:center; text-decoration:none; border-radius:8px;'>Go to Dashboard</a>";
 };
 </script>
 </body>

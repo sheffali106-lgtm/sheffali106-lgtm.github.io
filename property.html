@@ -69,6 +69,7 @@ async function loadProperty() {
     <p>${p.description || ''}</p>
     <p>Type: ${p.type || ''} | Beds: ${p.bedrooms || ''}</p>
     <a href="tel:${p.phone || ''}" class="btn" style="background:green; display:block; text-align:center; margin-top:10px;">📞 Call Landlord</a>
+    <a href="checkout.html?id=${propertyId}" class="btn" style="background:#00a651; display:block; text-align:center; margin-top:10px; color:white; text-decoration:none; padding:12px; border-radius:8px;">💳 Lipa na M-Pesa - Book Now</a>
   `;
 }
 

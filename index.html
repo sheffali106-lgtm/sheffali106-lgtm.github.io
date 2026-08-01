@@ -1,114 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RentEasy Kenya - Rentals Across Kenya</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RentEasy Kenya - Houses & Apartments for Rent Across Kenya</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Inter,system-ui,sans-serif;background:#111;padding:20px}
-.wrap{max-width:1000px;margin:0 auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,system-ui,sans-serif;background:#111;padding:20px}
+.wrap{max-width:1000px;margin:0 auto;background:#fff;border-radius:20px;overflow:hidden}
 .green{background:#15803d;padding:32px 20px 50px;text-align:center}
-.green h1{color:#fff;font-size:24px;font-weight:800}
-.green p{color:#dcfce7;font-size:12px;margin-top:8px;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.5}
+.green h1{color:#fff;font-size:24px;font-weight:800}.green p{color:#dcfce7;font-size:12px;margin-top:8px;max-width:520px;margin:0 auto;line-height:1.5}
 .search{max-width:640px;margin:22px auto 0;background:#fff;border-radius:14px;padding:8px;display:flex;gap:6px;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,.15)}
 .search input,.search select{border:0;background:#f3f4f6;border-radius:999px;padding:10px 12px;font-size:11px;outline:none;flex:1}
 .search button{background:#15803d;color:#fff;border:0;border-radius:999px;padding:10px 18px;font-size:11px;font-weight:700;cursor:pointer}
-.content{padding:24px 20px;background:#fff}
-.content h2{font-size:14px;font-weight:800;margin-bottom:14px}
+.content{padding:24px 20px}.content h2{font-size:14px;font-weight:800;margin-bottom:14px}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}} 
-@media(max-width:520px){.grid{grid-template-columns:1fr}.search{flex-wrap:wrap}}
-.card{border:1px solid #f1f5f9;border-radius:12px;overflow:hidden;background:#fff;cursor:pointer;transition:transform .2s}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.grid{grid-template-columns:1fr}.search{flex-wrap:wrap}}
+.card{border:1px solid #f1f5f9;border-radius:12px;overflow:hidden;background:#fff;cursor:pointer;transition:transform.2s;text-decoration:none;color:#111;display:block}
 .card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.08)}
-.card img{width:100%;height:140px;object-fit:cover;display:block}
-.card-body{padding:10px 12px}
-.price{color:#15803d;font-weight:800;font-size:12px}
-.title{font-weight:700;font-size:12px;margin-top:3px}
+.card img{width:100%;height:140px;object-fit:cover;display:block}.card-body{padding:10px 12px}
+.price{color:#15803d;font-weight:800;font-size:12px}.title{font-weight:700;font-size:12px;margin-top:3px}
 .meta{font-size:10px;color:#6b7280;margin-top:4px}
-.meta2{font-size:10px;color:#6b7280;margin-top:6px;display:flex;gap:10px}
-.mpesa{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:16px;margin-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
-.btn-mpesa{background:#111;color:#fff;border-radius:999px;padding:10px 18px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block}
-footer{text-align:center;padding:14px;font-size:10px;color:#9ca3af;background:#fafafa;line-height:1.6}
+footer{text-align:center;padding:14px;font-size:10px;color:#9ca3af;background:#fafafa}
+.listbtn{text-align:center;padding:0 0 20px}
+.listbtn a{background:#111;color:#fff;padding:12px 22px;border-radius:999px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block}
 .hidden{display:none!important}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="green">
-    <h1>Find Your Perfect Rental in Kenya</h1>
-    <p>Houses, Apartments & Bedsitters in Nairobi, Mombasa, Kisumu, Nakuru, Eldoret, Thika & Across Kenya</p>
-    <div class="search">
-      <input id="loc" type="text" placeholder="Search: Mombasa, Kisumu, Nakuru...">
-      <select id="type"><option value="">All Types</option><option>Apartment</option><option>Bedsitter</option><option>House</option><option>Studio</option></select>
-      <select id="price"><option value="">Any Price</option><option value="20000">Under 20k</option><option value="50000">20k-50k</option><option value="100000">50k-100k</option></select>
-      <button onclick="doSearch()">Search</button>
-    </div>
-  </div>
-
-  <div class="content">
-    <h2>Featured Properties Across Kenya</h2>
-    <div class="grid" id="grid">
-      <div class="card" data-location="kileleshwa nairobi" data-type="apartment" data-price="35000" onclick="openWA('2BR Apartment in Kileleshwa, Nairobi - KSh 35,000')">
-        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop">
-        <div class="card-body"><div class="price">KSh 35,000 / month</div><div class="title">2BR Apartment in Kileleshwa</div><div class="meta">📍 Kileleshwa, Nairobi</div><div class="meta2"><span>🛏️ 2 Beds</span><span>🛁 1 Bath</span></div></div>
-      </div>
-      <div class="card" data-location="nyali mombasa" data-type="apartment" data-price="45000" onclick="openWA('2BR in Nyali, Mombasa - KSh 45,000')">
-        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=400&fit=crop">
-        <div class="card-body"><div class="price">KSh 45,000 / month</div><div class="title">2BR Beach Apartment in Nyali</div><div class="meta">📍 Nyali, Mombasa</div><div class="meta2"><span>🛏️ 2 Beds</span><span>🛁 2 Bath</span></div></div>
-      </div>
-      <div class="card" data-location="milimani kisumu" data-type="house" data-price="60000" onclick="openWA('3BR House in Milimani, Kisumu - KSh 60,000')">
-        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop">
-        <div class="card-body"><div class="price">KSh 60,000 / month</div><div class="title">3BR House in Milimani</div><div class="meta">📍 Milimani, Kisumu</div><div class="meta2"><span>🛏️ 3 Beds</span><span>🛁 2 Bath</span></div></div>
-      </div>
-      <div class="card" data-location="nakuru town nakuru" data-type="bedsitter" data-price="12000" onclick="openWA('Bedsitter in Nakuru Town - KSh 12,000')">
-        <img src="https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=600&h=400&fit=crop">
-        <div class="card-body"><div class="price">KSh 12,000 / month</div><div class="title">Bedsitter in Nakuru Town</div><div class="meta">📍 Nakuru Town, Nakuru</div><div class="meta2"><span>🛏️ 1 Bed</span><span>🛁 1 Bath</span></div></div>
-      </div>
-      <div class="card" data-location="eldoret town eldoret" data-type="apartment" data-price="25000" onclick="openWA('1BR in Eldoret Town - KSh 25,000')">
-        <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=400&fit=crop">
-        <div class="card-body"><div class="price">KSh 25,000 / month</div><div class="title">1BR in Eldoret Town</div><div class="meta">📍 Eldoret Town, Uasin Gishu</div><div class="meta2"><span>🛏️ 1 Bed</span><span>🛁 1 Bath</span></div></div>
-      </div>
-      <div class="card" data-location="ruaka kiambu nairobi" data-type="bedsitter" data-price="18000" onclick="openWA('Bedsitter in Ruaka - KSh 18,000')">
-        <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop">
-        <div class="card-body"><div class="price">KSh 18,000 / month</div><div class="title">Bedsitter in Ruaka</div><div class="meta">📍 Ruaka, Kiambu</div><div class="meta2"><span>🛏️ 1 Bed</span><span>🛁 1 Bath</span></div></div>
-      </div>
-    </div>
-
-    <div class="mpesa">
-      <div>
-        <div style="font-weight:800;font-size:13px">Are You a Landlord Anywhere in Kenya? List from KSh 300</div>
-        <div style="font-size:11px;color:#6b7280;margin-top:2px">Pay via M-Pesa: <b style="color:#15803d">0799520544</b> - All Counties Welcome</div>
-      </div>
-      <a href="https://wa.me/254799520544?text=Hi%20RentEasy%20Kenya%20I%20want%20to%20list%20my%20property" class="btn-mpesa">List via WhatsApp →</a>
-    </div>
-  </div>
-  <footer>© 2026 RentEasy Kenya - Rentals Across All 47 Counties | M-Pesa: 0799520544 | info@renteasy.co.ke</footer>
-</div>
-
+<div class="green"><h1>Find Your Perfect Rental in Kenya</h1><p>Houses, Apartments & Bedsitters in Nairobi, Mombasa, Kisumu, Nakuru, Eldoret, Thika & Across Kenya</p>
+<div class="search"><input id="loc" type="text" placeholder="Search: Mombasa, Kisumu..."><select id="type"><option value="">All Types</option><option>Apartment</option><option>Bedsitter</option><option>House</option></select><select id="price"><option value="">Any Price</option><option value="20000">Under 20k</option><option value="50000">20k-50k</option><option value="100000">50k-100k</option></select><button onclick="doSearch()">Search</button></div></div>
+<div class="content"><h2>Featured Properties Across Kenya</h2>
+<div class="grid" id="grid">
+<a class="card" href="property.html?id=kileleshwa" data-location="kileleshwa nairobi" data-type="apartment" data-price="35000"><img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600"><div class="card-body"><div class="price">KSh 35,000 / month</div><div class="title">2BR Apartment in Kileleshwa</div><div class="meta">📍 Kileleshwa, Nairobi</div></div></a>
+<a class="card" href="property.html?id=nyali" data-location="nyali mombasa" data-type="apartment" data-price="45000"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600"><div class="card-body"><div class="price">KSh 45,000 / month</div><div class="title">2BR Beach Apartment in Nyali</div><div class="meta">📍 Nyali, Mombasa</div></div></a>
+<a class="card" href="property.html?id=kisumu" data-location="milimani kisumu" data-type="house" data-price="60000"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600"><div class="card-body"><div class="price">KSh 60,000 / month</div><div class="title">3BR House in Milimani</div><div class="meta">📍 Milimani, Kisumu</div></div></a>
+<a class="card" href="property.html?id=nakuru" data-location="nakuru town" data-type="bedsitter" data-price="12000"><img src="https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=600"><div class="card-body"><div class="price">KSh 12,000 / month</div><div class="title">Bedsitter in Nakuru Town</div><div class="meta">📍 Nakuru Town</div></div></a>
+<a class="card" href="property.html?id=eldoret" data-location="eldoret town" data-type="apartment" data-price="25000"><img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600"><div class="card-body"><div class="price">KSh 25,000 / month</div><div class="title">1BR in Eldoret Town</div><div class="meta">📍 Eldoret Town</div></div></a>
+<a class="card" href="property.html?id=ruaka" data-location="ruaka kiambu" data-type="bedsitter" data-price="18000"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600"><div class="card-body"><div class="price">KSh 18,000 / month</div><div class="title">Bedsitter in Ruaka</div><div class="meta">📍 Ruaka, Kiambu</div></div></a>
+</div></div>
+<div class="listbtn"><a href="list.html">+ List Your Property - KSh 300</a></div>
+<footer>© 2026 RentEasy Kenya | M-Pesa: 0799520544 | info@renteasy.co.ke | All 47 Counties</footer></div>
 <script>
-function openWA(msg){
-  window.open('https://wa.me/254799520544?text=Hi RentEasy Kenya, I am interested in ' + encodeURIComponent(msg), '_blank');
-}
 function doSearch(){
-  const loc = document.getElementById('loc').value.toLowerCase();
-  const type = document.getElementById('type').value.toLowerCase();
-  const price = document.getElementById('price').value;
-  document.querySelectorAll('.card').forEach(card=>{
-    const cLoc = card.dataset.location;
-    const cType = card.dataset.type;
-    const cPrice = parseInt(card.dataset.price);
-    let show = true;
-    if(loc && !cLoc.includes(loc)) show = false;
-    if(type && cType !== type) show = false;
-    if(price){
-      if(price==20000 && cPrice>20000) show=false;
-      if(price==50000 && (cPrice<20000 || cPrice>50000)) show=false;
-      if(price==100000 && (cPrice<50000 || cPrice>100000)) show=false;
-    }
-    card.classList.toggle('hidden', !show);
-  });
-}
-</script>
-</body>
-</html>
+const loc=document.getElementById('loc').value.toLowerCase(),type=document.getElementById('type').value.toLowerCase(),price=document.getElementById('price').value;
+document.querySelectorAll('.card').forEach(card=>{
+let cLoc=card.dataset.location,cType=card.dataset.type,cPrice=parseInt(card.dataset.price),show=true;
+if(loc&&!cLoc.includes(loc))show=false;if(type&&cType!==type)show=false;
+if(price){if(price==20000&&cPrice>20000)show=false;if(price==50000&&(cPrice<20000||cPrice>50000))show=false;if(price==100000&&(cPrice<50000||cPrice>100000))show=false;}
+card.classList.toggle('hidden',!show);});}
+</script></div></body></html>

@@ -1,119 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Property Details - RentEasy</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Property Details - RentEasy Kenya</title>
 <style>
-.review-box { background:#fff; padding:15px; border-radius:10px; margin-top:15px; }
-.stars { color:gold; font-size:20px; }
-.review-item { border-bottom:1px solid #eee; padding:10px 0; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Inter,system-ui,sans-serif;background:#f8fafc;padding:0}
+.nav{max-width:1000px;margin:0 auto;padding:12px 20px;display:flex;justify-content:space-between;font-size:13px;font-weight:700}
+.nav a{color:#15803d;text-decoration:none}
+.wrap{max-width:1000px;margin:0 auto;background:#fff;border-radius:0 0 20px 20px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.1)}
+.hero{height:380px;background-size:cover;background-position:center;position:relative}
+.hero.back{position:absolute;top:16px;left:16px;background:#fff;border-radius:999px;padding:8px 16px;font-size:12px;font-weight:700;text-decoration:none;color:#111}
+.content{padding:24px}
+.price{color:#15803d;font-weight:800;font-size:22px}
+.title{font-weight:800;font-size:20px;margin-top:6px}
+.meta{color:#6b7280;font-size:13px;margin-top:8px}
+.grid{display:grid;grid-template-columns:1fr 320px;gap:22px;margin-top:20px}
+@media(max-width:750px){.grid{grid-template-columns:1fr}.hero{height:250px}}
+.box{border:1px solid #e5e7eb;border-radius:14px;padding:16px}
+.btn{display:block;text-align:center;border-radius:999px;padding:13px;font-weight:700;text-decoration:none;margin-top:12px;font-size:13px}
+.btn-green{background:#15803d;color:#fff}
+.btn-black{background:#111;color:#fff}
+.btn-outline{border:1px solid #e5e7eb;color:#111;background:#fff}
 </style>
 </head>
 <body>
-<nav class="navbar">
-  <div class="logo">🏠 RentEasy Kenya</div>
-  <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="saved.html">❤️ Saved</a></li>
-  </ul>
-</nav>
-
-<div style="max-width:800px; margin:20px auto; padding:15px;">
-  <div id="propertyDetails">Loading property...</div>
-  
-  <!-- REVIEWS SECTION -->
-  <div class="review-box">
-    <h2>⭐ Reviews & Ratings</h2>
-    <p id="avgRating">Loading ratings...</p>
-    <div id="reviewsList"></div>
-    
-    <h3 style="margin-top:20px;">Leave a Review</h3>
-    <select id="ratingInput" style="padding:8px; width:100%; margin:5px 0;">
-      <option value="5">⭐⭐⭐⭐⭐ 5 - Excellent</option>
-      <option value="4">⭐⭐⭐⭐ 4 - Very Good</option>
-      <option value="3">⭐⭐⭐ 3 - Good</option>
-      <option value="2">⭐⭐ 2 - Poor</option>
-      <option value="1">⭐ 1 - Very Poor</option>
-    </select>
-    <textarea id="commentInput" placeholder="Write your review..." style="width:100%; height:80px; padding:10px; margin:5px 0;"></textarea>
-    <button onclick="submitReview()" class="btn" style="width:100%;">Submit Review</button>
-  </div>
-</div>
-
-<script type="module">
-import { db, auth } from "./firebase.js";
-import { doc, getDoc, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-
-const params = new URLSearchParams(window.location.search);
-const propertyId = params.get("id");
-const detailsDiv = document.getElementById("propertyDetails");
-const reviewsList = document.getElementById("reviewsList");
-const avgRatingP = document.getElementById("avgRating");
-let currentUser = null;
-
-onAuthStateChanged(auth, (user) => { currentUser = user; });
-
-async function loadProperty() {
-  if (!propertyId) { detailsDiv.innerHTML = "No property ID"; return; }
-  const snap = await getDoc(doc(db, "properties", propertyId));
-  if (!snap.exists()) { detailsDiv.innerHTML = "Property not found"; return; }
-  const p = snap.data();
-  detailsDiv.innerHTML = `
-    <img src="${p.imageUrl}" style="width:100%; height:300px; object-fit:cover; border-radius:15px;">
-    <h1>${p.title}</h1>
-    <p>📍 ${p.location}</p>
-    <p><strong style="font-size:22px;">Ksh ${p.price}/month</strong></p>
-    <p>${p.description || ''}</p>
-    <p>Type: ${p.type || ''} | Beds: ${p.bedrooms || ''}</p>
-    <a href="tel:${p.phone || ''}" class="btn" style="background:green; display:block; text-align:center; margin-top:10px;">📞 Call Landlord</a>
-    <a href="checkout.html?id=${propertyId}" class="btn" style="background:#00a651; display:block; text-align:center; margin-top:10px; color:white; text-decoration:none; padding:12px; border-radius:8px;">💳 Lipa na M-Pesa - Book Now</a>
-  `;
-}
-
-async function loadReviews() {
-  const q = query(collection(db, "reviews"), where("propertyId", "==", propertyId));
-  const snap = await getDocs(q);
-  if (snap.empty) {
-    avgRatingP.innerHTML = "No reviews yet. Be first!";
-    reviewsList.innerHTML = "";
-    return;
-  }
-  let total = 0;
-  let html = "";
-  snap.forEach(d => {
-    const r = d.data();
-    total += Number(r.rating);
-    html += `<div class="review-item"><strong>${r.userName || 'Anonymous'}</strong> - <span class="stars">${'⭐'.repeat(r.rating)}</span><p>${r.comment}</p><small>${new Date(r.createdAt?.toDate()).toLocaleDateString()}</small></div>`;
-  });
-  const avg = (total / snap.size).toFixed(1);
-  avgRatingP.innerHTML = `Average: ${'⭐'.repeat(Math.round(avg))} ${avg} (${snap.size} reviews)`;
-  reviewsList.innerHTML = html;
-}
-
-window.submitReview = async () => {
-  if (!currentUser) { alert("Please login to review"); window.location.href="landlord-login.html"; return; }
-  const rating = document.getElementById("ratingInput").value;
-  const comment = document.getElementById("commentInput").value.trim();
-  if (!comment) { alert("Write a comment"); return; }
-
-  await addDoc(collection(db, "reviews"), {
-    propertyId: propertyId,
-    userId: currentUser.uid,
-    userName: currentUser.email,
-    rating: Number(rating),
-    comment: comment,
-    createdAt: new Date()
-  });
-  alert("Review submitted ⭐");
-  document.getElementById("commentInput").value = "";
-  loadReviews();
+<div class="nav"><a href="index.html">🏠 RentEasy Kenya</a><div><a href="index.html" style="margin-right:12px">Home</a><a href="#">❤️ Saved</a></div></div>
+<div class="wrap" id="wrap">Loading property...</div>
+<script>
+const properties={
+kileleshwa:{title:"2BR Apartment in Kileleshwa",price:"KSh 35,000 / month",loc:"Kileleshwa, Nairobi",beds:"2",baths:"1",size:"85 sqm",img:"https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200",desc:"Spacious 2 bedroom apartment in the heart of Kileleshwa. Near schools, malls, and tarmacked road. Water 24/7, parking, balcony. Ideal for families across Kenya looking for Nairobi base."},
+nyali:{title:"2BR Beach Apartment in Nyali",price:"KSh 45,000 / month",loc:"Nyali, Mombasa",beds:"2",baths:"2",size:"95 sqm",img:"https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200",desc:"Beautiful beach apartment 5 mins to Nyali Beach, Mombasa. Ocean breeze, secure compound, swimming pool, backup generator. Perfect for coastal living."},
+kisumu:{title:"3BR House in Milimani",price:"KSh 60,000 / month",loc:"Milimani, Kisumu",beds:"3",baths:"2",size:"140 sqm",img:"https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200",desc:"Executive 3BR standalone house in Milimani Kisumu. Spacious compound, garage, garden, near Kisumu CBD and Lake Victoria view."},
+nakuru:{title:"Bedsitter in Nakuru Town",price:"KSh 12,000 / month",loc:"Nakuru Town, Nakuru",beds:"1",baths:"1",size:"25 sqm",img:"https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=1200",desc:"Affordable bedsitter in Nakuru Town CBD. Close to matatu stage, water & electricity available, secure. Great for students."},
+eldoret:{title:"1BR in Eldoret Town",price:"KSh 25,000 / month",loc:"Eldoret Town, Uasin Gishu",beds:"1",baths:"1",size:"55 sqm",img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200",desc:"Modern 1BR apartment in Eldoret Town. Near Moi University, malls, tarmac. Perfect for professionals."},
+ruaka:{title:"Bedsitter in Ruaka",price:"KSh 18,000 / month",loc:"Ruaka, Kiambu",beds:"1",baths:"1",size:"30 sqm",img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200",desc:"Clean bedsitter in Ruaka, 5 mins to Two Rivers Mall. Good for students and young professionals working in Westlands, Nairobi."}
 };
-
-loadProperty();
-loadReviews();
+function getId(){const p=new URLSearchParams(window.location.search).get('id');return p?p.toLowerCase().trim():'';}
+const id=getId();
+const prop=properties[id];
+const wrap=document.getElementById('wrap');
+if(!prop){
+wrap.innerHTML=`<div style="padding:40px;text-align:center"><h2>Property not found</h2><p style="color:#6b7280;margin-top:8px">ID: ${id||'none'} - Try <a href="index.html">Home</a></p><div style="margin-top:20px"><h3>Available: kileleshwa, nyali, kisumu, nakuru, eldoret, ruaka</h3></div></div>`;
+}else{
+wrap.innerHTML=`
+<div class="hero" style="background-image:url('${prop.img}')"><a class="back" href="index.html">← Back</a></div>
+<div class="content">
+<div class="price">${prop.price}</div>
+<div class="title">${prop.title}</div>
+<div class="meta">📍 ${prop.loc} • 🛏️ ${prop.beds} Beds • 🛁 ${prop.baths} Baths • 📐 ${prop.size}</div>
+<div class="grid">
+<div>
+<div class="box"><h3 style="font-size:14px;font-weight:800">About this property</h3><p style="font-size:13px;color:#374151;margin-top:10px;line-height:1.7">${prop.desc}</p><p style="font-size:12px;color:#6b7280;margin-top:14px">M-Pesa: <b style="color:#15803d">0799520544</b> • RentEasy Kenya - All 47 Counties</p></div>
+<div class="box" style="margin-top:16px"><h3 style="font-size:14px;font-weight:800">⭐ Reviews & Ratings</h3><p style="font-size:12px;color:#6b7280;margin-top:6px">No reviews yet. Be first!</p><div style="margin-top:12px"><label style="font-size:12px;font-weight:700">Leave a Review</label><select style="width:100%;margin-top:6px;padding:10px;border-radius:8px;border:1px solid #e5e7eb"><option>⭐⭐⭐⭐⭐ 5 - Excellent</option><option>⭐⭐⭐⭐ 4 - Good</option><option>⭐⭐⭐ 3 - Average</option></select><textarea placeholder="Write your review..." style="width:100%;margin-top:10px;padding:10px;border-radius:8px;border:1px solid #e5e7eb;height:80px"></textarea><button style="width:100%;margin-top:10px;padding:10px;border-radius:8px;border:1px solid #e5e7eb;background:#f9fafb;font-weight:700">Submit Review</button></div></div>
+</div>
+<div>
+<div class="box"><h3 style="font-size:14px;font-weight:800">Contact Landlord</h3>
+<a class="btn btn-green" href="https://wa.me/254799520544?text=Hi RentEasy Kenya, I'm interested in ${encodeURIComponent(prop.title)} in ${encodeURIComponent(prop.loc)}">💬 WhatsApp: 0799520544</a>
+<a class="btn btn-black" href="tel:0799520544">📞 Call Now</a>
+<a class="btn btn-outline" href="index.html">← Back to Listings</a>
+<div style="font-size:10px;color:#9ca3af;text-align:center;margin-top:14px">© RentEasy Kenya • 47 Counties<br>M-Pesa: 0799520544</div>
+</div>
+</div>
+</div>
+</div>`;
+document.title=prop.title+" - RentEasy Kenya";
+}
 </script>
 </body>
 </html>

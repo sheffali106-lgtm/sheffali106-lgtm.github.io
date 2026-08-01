@@ -1,156 +1,118 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Property Details | RentEasy Kenya</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Property Details - RentEasy</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.review-box { background:#fff; padding:15px; border-radius:10px; margin-top:15px; }
+.stars { color:gold; font-size:20px; }
+.review-item { border-bottom:1px solid #eee; padding:10px 0; }
+</style>
 </head>
 <body>
-
 <nav class="navbar">
-    <div class="logo">🏠 RentEasy Kenya</div>
-    <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="list-property.html">List Property</a></li>
-        <li><a href="#" id="logoutBtn" style="display:none;">Logout</a></li>
-    </ul>
+  <div class="logo">🏠 RentEasy Kenya</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="saved.html">❤️ Saved</a></li>
+  </ul>
 </nav>
 
-<section id="propertyDetails" style="max-width:900px; margin:40px auto; padding:20px;">
-    <p>Loading property...</p>
-</section>
+<div style="max-width:800px; margin:20px auto; padding:15px;">
+  <div id="propertyDetails">Loading property...</div>
+  
+  <!-- REVIEWS SECTION -->
+  <div class="review-box">
+    <h2>⭐ Reviews & Ratings</h2>
+    <p id="avgRating">Loading ratings...</p>
+    <div id="reviewsList"></div>
+    
+    <h3 style="margin-top:20px;">Leave a Review</h3>
+    <select id="ratingInput" style="padding:8px; width:100%; margin:5px 0;">
+      <option value="5">⭐⭐⭐⭐⭐ 5 - Excellent</option>
+      <option value="4">⭐⭐⭐⭐ 4 - Very Good</option>
+      <option value="3">⭐⭐⭐ 3 - Good</option>
+      <option value="2">⭐⭐ 2 - Poor</option>
+      <option value="1">⭐ 1 - Very Poor</option>
+    </select>
+    <textarea id="commentInput" placeholder="Write your review..." style="width:100%; height:80px; padding:10px; margin:5px 0;"></textarea>
+    <button onclick="submitReview()" class="btn" style="width:100%;">Submit Review</button>
+  </div>
+</div>
 
 <script type="module">
 import { db, auth } from "./firebase.js";
-import { doc, getDoc, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import { doc, getDoc, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
 const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
-const container = document.getElementById("propertyDetails");
+const propertyId = params.get("id");
+const detailsDiv = document.getElementById("propertyDetails");
+const reviewsList = document.getElementById("reviewsList");
+const avgRatingP = document.getElementById("avgRating");
+let currentUser = null;
 
-// Logout button logic
-onAuthStateChanged(auth, (user) => {
-    const btn = document.getElementById('logoutBtn');
-    if (user) { btn.style.display = 'block'; } else { btn.style.display = 'none'; }
-});
-document.getElementById('logoutBtn')?.addEventListener('click', async (e) => {
-    e.preventDefault(); await signOut(auth); window.location.href = "index.html";
-});
+onAuthStateChanged(auth, (user) => { currentUser = user; });
 
-if (!id) {
-    container.innerHTML = "<p>No property ID. Go <a href='index.html'>Home</a>.</p>";
-} else {
-    try {
-        const snap = await getDoc(doc(db, "properties", id));
-        if (!snap.exists()) {
-            container.innerHTML = "<p>Property not found.</p>";
-        } else {
-            const p = snap.data();
-            const location = p.location || p.area || "Location unavailable";
-            const rooms = p.rooms || p.bedrooms || "N/A";
-            const price = p.price || p.rent || 0;
-            const formattedPrice = typeof price === 'number' ? price.toLocaleString() : price;
-            const title = p.title || "Rental Property";
-            const description = p.description || "No description.";
-            const type = p.type || "Not specified";
-            const phone = p.phone || "";
-            const amenities = p.amenities || "Not specified";
-            const images = Array.isArray(p.images) && p.images.length > 0 ? p.images : [p.image || p.imageUrl || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800"];
-            let currentImage = 0;
-
-            // Clean phone for wa.me
-            let whatsappNumber = phone.replace(/\s+/g, '').replace(/\+/g, '');
-            if (whatsappNumber.startsWith('0')) whatsappNumber = '254' + whatsappNumber.substring(1);
-            const waMessage = encodeURIComponent(`Hi! I'm interested in your property *${title}* in ${location} - KSh ${formattedPrice}/month listed on RentEasy Kenya. Is it still available?`);
-            const waLink = `https://wa.me/${whatsappNumber}?text=${waMessage}`;
-
-            container.innerHTML = `
-                <img id="galleryImage" src="${images[0]}" style="width:100%;border-radius:10px;max-height:500px;object-fit:cover;">
-                <div style="display:flex;justify-content:space-between;margin-top:15px;">
-                    <button id="prevImage" class="btn" style="background:#ddd;color:#333;">◀ Previous</button>
-                    <button id="nextImage" class="btn" style="background:#ddd;color:#333;">Next ▶</button>
-                </div>
-                <h2 style="margin-top:20px;">${title}</h2>
-                <p>🏢 <strong>Type:</strong> ${type}</p>
-                <p>📍 <strong>Location:</strong> ${location}</p>
-                <p>🛏️ <strong>Bedrooms:</strong> ${rooms}</p>
-                <p>💰 <strong>Rent:</strong> KSh ${formattedPrice}/month</p>
-                <p>📞 <strong>Contact:</strong> ${phone || "Not provided"}</p>
-                <p>✅ <strong>Amenities:</strong> ${amenities}</p>
-                <p style="margin-top:20px;"><strong>Description</strong><br>${description}</p>
-
-                <div style="display:flex;gap:15px;flex-wrap:wrap;margin-top:30px;">
-                    ${phone ? `<a href="tel:${phone}" style="background:#0d6efd; color:white; padding:12px 20px; border-radius:6px; text-decoration:none;">📞 Call Landlord</a>` : ""}
-                    ${phone ? `<a href="${waLink}" target="_blank" style="background:#25D366; color:white; padding:12px 20px; border-radius:6px; text-decoration:none; font-weight:bold;">💬 WhatsApp Landlord</a>` : ""}
-                    <a href="https://www.google.com/maps/search/${encodeURIComponent(location)}" target="_blank" style="background:#EA4335; color:white; padding:12px 20px; border-radius:6px; text-decoration:none;">📍 View on Maps</a>
-                </div>
-
-                <br><br><hr style="margin:40px 0;">
-                <h2>📅 Book a Viewing</h2>
-                <form id="bookingForm" style="display:flex;flex-direction:column;gap:15px;max-width:500px;">
-                    <input type="text" id="viewerName" placeholder="Your Full Name" required>
-                    <input type="tel" id="viewerPhone" placeholder="Your Phone Number" required>
-                    <input type="date" id="viewingDate" required>
-                    <input type="time" id="viewingTime" required>
-                    <textarea id="viewerMessage" rows="4" placeholder="Optional message"></textarea>
-                    <button type="submit" style="background:#25D366;color:white;border:none;padding:12px;border-radius:6px;cursor:pointer;">Book Viewing</button>
-                </form>
-                <div id="bookingMessage" style="margin-top:15px;"></div>
-                <br><a href="index.html" style="color:#25D366;">← Back to listings</a>
-                <hr style="margin:40px 0;">
-                <h2>🏠 Similar Properties</h2>
-                <div id="similarProperties"><p>Loading...</p></div>
-            `;
-
-            const galleryImage = document.getElementById("galleryImage");
-            const prevImage = document.getElementById("prevImage");
-            const nextImage = document.getElementById("nextImage");
-            if (images.length <= 1) { prevImage.style.display = "none"; nextImage.style.display = "none"; } 
-            else {
-                prevImage.addEventListener("click", () => { currentImage = (currentImage - 1 + images.length) % images.length; galleryImage.src = images[currentImage]; });
-                nextImage.addEventListener("click", () => { currentImage = (currentImage + 1) % images.length; galleryImage.src = images[currentImage]; });
-            }
-
-            const similarContainer = document.getElementById("similarProperties");
-            const snapshot = await getDocs(collection(db, "properties"));
-            let html = ""; let count = 0;
-            snapshot.forEach((docSnap) => {
-                if (docSnap.id === id) return;
-                const item = docSnap.data();
-                const sameLocation = (item.location || "").toLowerCase() === location.toLowerCase();
-                const sameType = (item.type || "").toLowerCase() === type.toLowerCase();
-                if ((sameLocation || sameType) && count < 3) {
-                    const img = item.image || item.imageUrl || "https://picsum.photos/400/250";
-                    html += `<div style="border:1px solid #ddd;padding:15px;margin-bottom:15px;border-radius:10px;"><img src="${img}" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;"><h3>${item.title}</h3><p>📍 ${item.location}</p><p><strong>KSh ${item.price}/month</strong></p><a href="property.html?id=${docSnap.id}" style="display:inline-block;margin-top:10px;background:#25D366;color:white;padding:10px 18px;border-radius:6px;text-decoration:none;">View Details</a></div>`;
-                    count++;
-                }
-            });
-            similarContainer.innerHTML = html || "<p>No similar properties found.</p>";
-
-            const bookingForm = document.getElementById("bookingForm");
-            bookingForm.addEventListener("submit", async (e) => {
-                e.preventDefault();
-                try {
-                    await addDoc(collection(db, "bookings"), {
-                        propertyId: id, propertyTitle: title, propertyLocation: location, landlordPhone: phone,
-                        visitorName: document.getElementById("viewerName").value.trim(),
-                        visitorPhone: document.getElementById("viewerPhone").value.trim(),
-                        viewingDate: document.getElementById("viewingDate").value,
-                        viewingTime: document.getElementById("viewingTime").value,
-                        message: document.getElementById("viewerMessage").value.trim(),
-                        createdAt: serverTimestamp()
-                    });
-                    document.getElementById("bookingMessage").innerHTML = `<p style="color:green;">✅ Viewing request sent! The landlord will contact you on WhatsApp.</p>`;
-                    bookingForm.reset();
-                } catch (error) { document.getElementById("bookingMessage").innerHTML = `<p style="color:red;">Failed to send booking.</p>`; }
-            });
-        }
-    } catch (err) {
-        container.innerHTML = `<p>Error loading: ${err.message}</p>`;
-    }
+async function loadProperty() {
+  if (!propertyId) { detailsDiv.innerHTML = "No property ID"; return; }
+  const snap = await getDoc(doc(db, "properties", propertyId));
+  if (!snap.exists()) { detailsDiv.innerHTML = "Property not found"; return; }
+  const p = snap.data();
+  detailsDiv.innerHTML = `
+    <img src="${p.imageUrl}" style="width:100%; height:300px; object-fit:cover; border-radius:15px;">
+    <h1>${p.title}</h1>
+    <p>📍 ${p.location}</p>
+    <p><strong style="font-size:22px;">Ksh ${p.price}/month</strong></p>
+    <p>${p.description || ''}</p>
+    <p>Type: ${p.type || ''} | Beds: ${p.bedrooms || ''}</p>
+    <a href="tel:${p.phone || ''}" class="btn" style="background:green; display:block; text-align:center; margin-top:10px;">📞 Call Landlord</a>
+  `;
 }
+
+async function loadReviews() {
+  const q = query(collection(db, "reviews"), where("propertyId", "==", propertyId));
+  const snap = await getDocs(q);
+  if (snap.empty) {
+    avgRatingP.innerHTML = "No reviews yet. Be first!";
+    reviewsList.innerHTML = "";
+    return;
+  }
+  let total = 0;
+  let html = "";
+  snap.forEach(d => {
+    const r = d.data();
+    total += Number(r.rating);
+    html += `<div class="review-item"><strong>${r.userName || 'Anonymous'}</strong> - <span class="stars">${'⭐'.repeat(r.rating)}</span><p>${r.comment}</p><small>${new Date(r.createdAt?.toDate()).toLocaleDateString()}</small></div>`;
+  });
+  const avg = (total / snap.size).toFixed(1);
+  avgRatingP.innerHTML = `Average: ${'⭐'.repeat(Math.round(avg))} ${avg} (${snap.size} reviews)`;
+  reviewsList.innerHTML = html;
+}
+
+window.submitReview = async () => {
+  if (!currentUser) { alert("Please login to review"); window.location.href="landlord-login.html"; return; }
+  const rating = document.getElementById("ratingInput").value;
+  const comment = document.getElementById("commentInput").value.trim();
+  if (!comment) { alert("Write a comment"); return; }
+
+  await addDoc(collection(db, "reviews"), {
+    propertyId: propertyId,
+    userId: currentUser.uid,
+    userName: currentUser.email,
+    rating: Number(rating),
+    comment: comment,
+    createdAt: new Date()
+  });
+  alert("Review submitted ⭐");
+  document.getElementById("commentInput").value = "";
+  loadReviews();
+};
+
+loadProperty();
+loadReviews();
 </script>
 </body>
 </html>

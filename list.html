@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>List Your Property - RentEasy Kenya</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,sans-serif;background:#f8fafc;padding:20px}
+.nav{max-width:800px;margin:0 auto 16px;display:flex;justify-content:space-between;font-size:13px;font-weight:700}
+.nav a{color:#15803d;text-decoration:none}
+.wrap{max-width:600px;margin:0 auto;background:#fff;border-radius:20px;padding:24px;box-shadow:0 10px 40px rgba(0,0,0,.08)}
+.wrap h1{font-size:22px;font-weight:800}
+.wrap p{font-size:13px;color:#6b7280;margin-top:6px;line-height:1.5}
+label{font-size:12px;font-weight:700;display:block;margin-top:16px}
+input,select,textarea{width:100%;margin-top:6px;padding:12px;border-radius:10px;border:1px solid #e5e7eb;font-size:13px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#15803d}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{background:#15803d;color:#fff;border:0;border-radius:999px;padding:14px;font-weight:800;width:100%;margin-top:20px;cursor:pointer;font-size:14px}
+.mpesabox{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px;margin-top:16px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="nav"><a href="index.html">🏠 RentEasy Kenya</a><a href="index.html">← Home</a></div>
+<div class="wrap">
+<h1>List Your Property in Kenya</h1>
+<p>Fill this form. We'll receive it on WhatsApp <b>0799520544</b> and list it within 24 hours. All 47 Counties welcome.</p>
+
+<label>Property Title *</label>
+<input id="title" placeholder="e.g. 2BR Apartment in Nyali">
+
+<div class="row">
+<div><label>County *</label><select id="county"><option value="">Select County</option><option>Nairobi</option><option>Mombasa</option><option>Kisumu</option><option>Nakuru</option><option>Kiambu</option><option>Uasin Gishu</option><option>Kilifi</option><option>Kajiado</option><option>Machakos</option><option>Other</option></select></div>
+<div><label>Location / Estate *</label><input id="location" placeholder="e.g. Nyali, Bamburi"></div>
+</div>
+
+<div class="row">
+<div><label>Type *</label><select id="type"><option>Apartment</option><option>Bedsitter</option><option>House</option><option>Studio</option><option>Single Room</option></select></div>
+<div><label>Price per Month (KSh) *</label><input id="price" type="number" placeholder="e.g. 45000"></div>
+</div>
+
+<div class="row">
+<div><label>Bedrooms</label><select id="beds"><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select></div>
+<div><label>Bathrooms</label><select id="baths"><option>1</option><option>2</option><option>3</option><option>4+</option></select></div>
+</div>
+
+<label>Phone Number (M-Pesa) *</label>
+<input id="phone" placeholder="e.g. 0799...">
+
+<label>Description</label>
+<textarea id="desc" rows="4" placeholder="Water 24/7, parking, near beach, etc."></textarea>
+
+<div class="mpesabox">
+<b>Payment:</b> KSh 300 listing fee via M-Pesa to <b style="color:#15803d">0799520544</b> (Ben Karari). After payment, click Send.<br>
+For now, send photos separately on WhatsApp after submitting.
+</div>
+
+<button class="btn" onclick="send()">📤 Send via WhatsApp → 0799520544</button>
+<p style="font-size:10px;color:#9ca3af;text-align:center;margin-top:12px">© RentEasy Kenya • info@renteasy.co.ke</p>
+</div>
+
+<script>
+function send(){
+const t=document.getElementById('title').value;
+const c=document.getElementById('county').value;
+const l=document.getElementById('location').value;
+const ty=document.getElementById('type').value;
+const pr=document.getElementById('price').value;
+const bd=document.getElementById('beds').value;
+const ba=document.getElementById('baths').value;
+const ph=document.getElementById('phone').value;
+const d=document.getElementById('desc').value;
+if(!t||!c||!l||!pr||!ph){alert("Please fill Title, County, Location, Price and Phone");return;}
+const msg=`NEW LISTING - RentEasy Kenya%0A%0ATitle: ${t}%0ACounty: ${c}%0ALocation: ${l}%0AType: ${ty}%0APrice: KSh ${pr}%0ABeds: ${bd} Baths: ${ba}%0APhone: ${ph}%0ADesc: ${d}%0A%0AM-Pesa Paid: (attach screenshot)`;
+window.open(`https://wa.me/254799520544?text=${msg}`,'_blank');
+}
+</script>
+</body>
+</html>

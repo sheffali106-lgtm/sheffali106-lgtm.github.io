@@ -39,13 +39,4 @@ footer{text-align:center;padding:14px;font-size:10px;color:#9ca3af;background:#f
 <a class="card" href="property.html?id=ruaka" data-location="ruaka kiambu" data-type="bedsitter" data-price="18000"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600"><div class="card-body"><div class="price">KSh 18,000 / month</div><div class="title">Bedsitter in Ruaka</div><div class="meta">📍 Ruaka, Kiambu</div></div></a>
 </div></div>
 <div class="listbtn"><a href="list.html">+ List Your Property - KSh 300</a></div>
-<footer>© 2026 RentEasy Kenya | M-Pesa: 0799520544 | info@renteasy.co.ke | All 47 Counties</footer></div>
-<script>
-function doSearch(){
-const loc=document.getElementById('loc').value.toLowerCase(),type=document.getElementById('type').value.toLowerCase(),price=document.getElementById('price').value;
-document.querySelectorAll('.card').forEach(card=>{
-let cLoc=card.dataset.location,cType=card.dataset.type,cPrice=parseInt(card.dataset.price),show=true;
-if(loc&&!cLoc.includes(loc))show=false;if(type&&cType!==type)show=false;
-if(price){if(price==20000&&cPrice>20000)show=false;if(price==50000&&(cPrice<20000||cPrice>50000))show=false;if(price==100000&&(cPrice<50000||cPrice>100000))show=false;}
-card.classList.toggle('hidden',!show);});}
-</script></div></body></html>
+<footer>© 2026 RentEasy Kenya

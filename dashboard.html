@@ -1,97 +1,142 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | RentEasy Kenya</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - RentEasy</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.dash-container { max-width:1000px; margin:20px auto; padding:15px; }
+.card { background:#fff; padding:15px; border-radius:12px; margin:10px 0; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+.property-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:15px; }
+.payment-card { border-left:4px solid #00a651; }
+</style>
 </head>
 <body>
-
 <nav class="navbar">
-    <div class="logo">🏠 RentEasy Kenya</div>
-    <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="list-property.html">List Property</a></li>
-        <li><a href="#" id="logoutBtn">Logout</a></li>
-    </ul>
+  <div class="logo">🏠 RentEasy Kenya</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="list-property.html">+ List Property</a></li>
+    <li><a href="#" id="logoutBtn">Logout</a></li>
+  </ul>
 </nav>
 
-<section style="max-width:1000px; margin:40px auto; padding:20px;">
-    <h2 id="welcomeText">Loading your listings...</h2>
-    <p id="countText"></p>
-    
-    <div id="dashboardList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:20px; margin-top:30px;">
-        <!-- Properties load here -->
-    </div>
-</section>
+<div class="dash-container">
+  <h1>Landlord Dashboard</h1>
+  <p id="userEmail"></p>
+
+  <h2 style="margin-top:25px;">💰 M-Pesa Payments Received</h2>
+  <div id="paymentsList" class="card">Loading payments...</div>
+
+  <h2 style="margin-top:25px;">🏠 My Listed Properties</h2>
+  <div id="myProperties" class="property-grid">Loading your properties...</div>
+</div>
 
 <script type="module">
 import { db, auth } from "./firebase.js";
+import { collection, query, where, getDocs, doc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { collection, query, where, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-const list = document.getElementById('dashboardList');
-const welcome = document.getElementById('welcomeText');
-const countText = document.getElementById('countText');
+const myPropertiesDiv = document.getElementById("myProperties");
+const paymentsListDiv = document.getElementById("paymentsList");
+const userEmailP = document.getElementById("userEmail");
 
 onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-        window.location.href = "landlord-login.html";
-        return;
-    }
-
-    welcome.textContent = `Welcome, ${user.email}`;
-    
-    document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-        e.preventDefault(); await signOut(auth); window.location.href = "index.html";
-    });
-
-    // Load only MY properties
-    const q = query(collection(db, "properties"), where("landlordId", "==", user.uid));
-    const snap = await getDocs(q);
-
-    if (snap.empty) {
-        list.innerHTML = `<p>You have no listings yet. <a href="list-property.html">List one now</a></p>`;
-        countText.textContent = "0 properties";
-        return;
-    }
-
-    countText.textContent = `${snap.size} properties listed`;
-    let html = "";
-    snap.forEach((docSnap) => {
-        const p = docSnap.data();
-        const price = (p.price || p.rent || 0).toLocaleString();
-        const image = p.image || p.imageUrl || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800";
-        html += `
-        <div style="border:1px solid #ddd; border-radius:10px; overflow:hidden;">
-            <img src="${image}" style="width:100%; height:180px; object-fit:cover;">
-            <div style="padding:15px;">
-                <h3>${p.title}</h3>
-                <p>📍 ${p.location}</p>
-                <p><strong>KSh ${price}</strong></p>
-                <div style="display:flex; gap:10px; margin-top:15px;">
-                    <a href="property.html?id=${docSnap.id}" style="background:#0d6efd; color:white; padding:8px 12px; border-radius:5px; text-decoration:none;">View</a>
-                    <button onclick="deleteProperty('${docSnap.id}')" style="background:#dc3545; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Delete</button>
-                </div>
-            </div>
-        `;
-    });
-    list.innerHTML = html;
+  if (!user) {
+    window.location.href = "landlord-login.html";
+    return;
+  }
+  userEmailP.textContent = "Logged in as: " + user.email;
+  
+  // Load My Properties
+  loadMyProperties(user.uid);
+  loadPayments(user.uid);
 });
 
-// Make delete function global
-window.deleteProperty = async (id) => {
-    if (!confirm("Delete this property? This cannot be undone.")) return;
-    try {
-        await deleteDoc(doc(db, "properties", id));
-        alert("Deleted!");
-        window.location.reload();
-    } catch (err) {
-        alert("Error: " + err.message);
-    }
-}
-</script>
+async function loadMyProperties(uid) {
+  const q = query(collection(db, "properties"), where("ownerId", "==", uid));
+  const snap = await getDocs(q);
+  
+  if (snap.empty) {
+    myPropertiesDiv.innerHTML = "<p>You haven't listed any properties yet. <a href='list-property.html'>List one</a></p>";
+    return;
+  }
 
+  myPropertiesDiv.innerHTML = "";
+  snap.forEach((docSnap) => {
+    const p = docSnap.data();
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <img src="${p.imageUrl}" style="width:100%; height:160px; object-fit:cover; border-radius:8px;">
+      <h3>${p.title}</h3>
+      <p>📍 ${p.location} - Ksh ${p.price}</p>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <a href="edit-property.html?id=${docSnap.id}" class="btn" style="flex:1; text-align:center;">Edit</a>
+        <button onclick="deleteProperty('${docSnap.id}')" class="btn" style="flex:1; background:#ff4757;">Delete</button>
+      </div>
+    `;
+    myPropertiesDiv.appendChild(div);
+  });
+}
+
+async function loadPayments(uid) {
+  // Load all payments, then filter to only my properties
+  const myPropsQuery = query(collection(db, "properties"), where("ownerId", "==", uid));
+  const myPropsSnap = await getDocs(myPropsQuery);
+  const myPropertyIds = [];
+  const myPropertyTitles = {};
+  myPropsSnap.forEach(d => {
+    myPropertyIds.push(d.id);
+    myPropertyTitles[d.id] = d.data().title;
+  });
+
+  const paymentsSnap = await getDocs(collection(db, "payments"));
+  
+  if (paymentsSnap.empty) {
+    paymentsListDiv.innerHTML = "No payments yet.";
+    return;
+  }
+
+  let html = "";
+  let found = 0;
+  paymentsSnap.forEach(d => {
+    const pay = d.data();
+    if (myPropertyIds.includes(pay.propertyId)) {
+      found++;
+      html += `
+        <div class="card payment-card">
+          <strong>${pay.propertyTitle || myPropertyTitles[pay.propertyId]}</strong><br>
+          M-Pesa Code: <b style="color:#00a651;">${pay.mpesaCode}</b><br>
+          Phone: ${pay.phone}<br>
+          Amount: <b>Ksh ${pay.amount}</b><br>
+          From: ${pay.userEmail}<br>
+          Status: <span style="background:orange; color:white; padding:2px 8px; border-radius:10px;">${pay.status}</span><br>
+          <small>${pay.createdAt ? new Date(pay.createdAt.toDate()).toLocaleString() : ''}</small><br>
+          <button onclick="verifyPayment('${d.id}')" class="btn" style="background:#00a651; margin-top:8px;">✅ Verify & Approve</button>
+        </div>
+      `;
+    }
+  });
+
+  paymentsListDiv.innerHTML = found > 0 ? html : "No payments for your properties yet. Payments will appear here when tenants pay via M-Pesa.";
+}
+
+window.deleteProperty = async (id) => {
+  if (!confirm("Delete this property?")) return;
+  await deleteDoc(doc(db, "properties", id));
+  location.reload();
+};
+
+window.verifyPayment = async (id) => {
+  alert("Payment verified! In real app, you would update status to approved and contact tenant. ID: " + id);
+};
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.href = "index.html";
+});
+</script>
 </body>
 </html>

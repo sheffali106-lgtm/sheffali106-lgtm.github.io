@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title>Pay with M-Pesa - RentEasy</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.pay-card { max-width:500px; margin:20px auto; background:#fff; padding:20px; border-radius:15px; box-shadow:0 2px 10px rgba(0,0,0,0.1); }
+.mpesa-box { background:#00a651; color:white; padding:15px; border-radius:10px; text-align:center; margin:15px 0; }
+</style>
+</head>
+<body>
+<nav class="navbar"><div class="logo">🏠 RentEasy Kenya</div><ul class="nav-links"><li><a href="index.html">Home</a></li></ul></nav>
+
+<div class="pay-card">
+  <h2>Lipa na M-Pesa</h2>
+  <div id="propInfo">Loading...</div>
+  
+  <div class="mpesa-box">
+    <h3>Paybill / Till: 522</h3>
+    <p>Account No: RENTEASY</p>
+    <p>Or Till: <strong>5847835</strong></p>
+    <small>Change to YOUR real Till before presentation</small>
+  </div>
+
+  <p>1. Go to M-Pesa on phone</p>
+  <p>2. Lipa na M-Pesa → Buy Goods → Enter Till</p>
+  <p>3. Enter Amount</p>
+  <p>4. Enter PIN → You get SMS code e.g. QGH7...</p>
+
+  <h3>Confirm Payment</h3>
+  <input type="text" id="mpesaCode" placeholder="Enter M-Pesa Code e.g. QGH7RTU..." style="width:100%; padding:10px; margin:5px 0;">
+  <input type="text" id="phone" placeholder="Your M-Pesa Phone 07..." style="width:100%; padding:10px; margin:5px 0;">
+  <button onclick="confirmPayment()" class="btn" style="width:100%; background:#00a651;">I Have Paid - Confirm</button>
+  
+  <p id="status" style="margin-top:10px;"></p>
+</div>
+
+<script type="module">
+import { db, auth } from "./firebase.js";
+import { doc, getDoc, addDoc, collection } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+
+const params = new URLSearchParams(window.location.search);
+const propertyId = params.get("id");
+let currentUser = null;
+let propertyData = null;
+
+onAuthStateChanged(auth, u => currentUser = u);
+
+async function loadProp() {
+  const snap = await getDoc(doc(db, "properties", propertyId));
+  if (snap.exists()) {
+    propertyData = snap.data();
+    document.getElementById("propInfo").innerHTML = `<h3>${propertyData.title}</h3><p>${propertyData.location}</p><p><strong>Ksh ${propertyData.price} Deposit</strong></p>`;
+  }
+}
+loadProp();
+
+window.confirmPayment = async () => {
+  const code = document.getElementById("mpesaCode").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  if (!code || !phone) { alert("Enter code and phone"); return; }
+  if (!currentUser) { alert("Login first"); window.location.href="landlord-login.html"; return; }
+
+  await addDoc(collection(db, "payments"), {
+    propertyId: propertyId,
+    propertyTitle: propertyData.title,
+    userId: currentUser.uid,
+    userEmail: currentUser.email,
+    mpesaCode: code,
+    phone: phone,
+    amount: propertyData.price,
+    status: "pending",
+    createdAt: new Date()
+  });
+  
+  document.getElementById("status").innerHTML = "✅ Payment recorded! Code: "+code+" <br> Landlord will verify and contact you. <br><br><a href='dashboard.html'>Go to Dashboard</a>";
+};
+</script>
+</body>
+</html>
